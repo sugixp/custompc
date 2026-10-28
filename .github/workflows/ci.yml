@@ -45,3 +45,53 @@ jobs:
 
       - name: Build
         run: npm run build
+
+  database:
+    name: Migrate and seed a fresh database
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    services:
+      postgres:
+        # Same image as docker-compose.yml.
+        image: postgres:18.6-alpine
+        env:
+          POSTGRES_USER: custompc
+          POSTGRES_PASSWORD: custompc
+          POSTGRES_DB: custompc
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U custompc -d custompc"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      DATABASE_URL: postgresql://custompc:custompc@localhost:5432/custompc
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - run: npm ci
+
+      - name: Apply migrations
+        run: npm run db:deploy
+
+      - name: Check the schema matches the migrations
+        run: npx prisma migrate diff --from-config-datasource --to-schema prisma/schema.prisma --exit-code
+
+      - name: Seed
+        run: npm run db:seed
+
+      # The seed upserts everything, so a second run must change nothing.
+      - name: Seed again (idempotency)
+        run: |
+          before=$(psql "$DATABASE_URL" -tAc 'select count(*) from "Part"; select count(*) from "Offer"; select count(*) from "Store";' | tr '\n' ' ')
+          npm run db:seed
+          after=$(psql "$DATABASE_URL" -tAc 'select count(*) from "Part"; select count(*) from "Offer"; select count(*) from "Store";' | tr '\n' ' ')
+          echo "before: $before / after: $after"
+          test "$before" = "$after"
+          test "$(echo $before | cut -d' ' -f1)" -gt 0
