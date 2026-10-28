@@ -1,0 +1,103 @@
+import type { SeedPart } from "../types";
+
+// Kingston FURY Beast product pages. Speed, kit size and total capacity come
+// from the page's part-number filters (DDR5 also lists CAS latency there).
+// For DDR4 the latency is the "C16" in Kingston's part number.
+
+const DDR5_PAGE =
+  "https://www.kingston.com/en/memory/gaming/kingston-fury-beast-ddr5-memory";
+const DDR4_PAGE =
+  "https://www.kingston.com/en/memory/gaming/kingston-fury-beast-ddr4-memory";
+
+export const memory: SeedPart[] = [
+  {
+    slug: "kingston-fury-beast-ddr5-6000-cl30-2x16gb",
+    category: "MEMORY",
+    brand: "Kingston",
+    model: "FURY Beast DDR5-6000 CL30 2x16GB (KF560C30BBEK2-32)",
+    specs: {
+      type: "DDR5",
+      moduleCount: 2,
+      moduleCapacityGb: 16,
+      speedMts: 6000,
+      casLatency: 30,
+    },
+    specSourceUrls: [DDR5_PAGE],
+    referencePriceCents: 79_990,
+  },
+  {
+    slug: "kingston-fury-beast-ddr5-6000-cl30-2x32gb",
+    category: "MEMORY",
+    brand: "Kingston",
+    model: "FURY Beast DDR5-6000 CL30 2x32GB (KF560C30BBEK2-64)",
+    specs: {
+      type: "DDR5",
+      moduleCount: 2,
+      moduleCapacityGb: 32,
+      speedMts: 6000,
+      casLatency: 30,
+    },
+    specSourceUrls: [DDR5_PAGE],
+    referencePriceCents: 159_990,
+  },
+  {
+    slug: "kingston-fury-beast-ddr5-5600-cl40-2x16gb",
+    category: "MEMORY",
+    brand: "Kingston",
+    model: "FURY Beast DDR5-5600 CL40 2x16GB (KF556C40BBK2-32)",
+    specs: {
+      type: "DDR5",
+      moduleCount: 2,
+      moduleCapacityGb: 16,
+      speedMts: 5600,
+      casLatency: 40,
+    },
+    specSourceUrls: [DDR5_PAGE],
+    referencePriceCents: 69_990,
+  },
+  {
+    slug: "kingston-fury-beast-ddr5-5200-cl40-4x16gb",
+    category: "MEMORY",
+    brand: "Kingston",
+    model: "FURY Beast DDR5-5200 CL40 4x16GB (KF552C40BBK4-64)",
+    specs: {
+      type: "DDR5",
+      moduleCount: 4,
+      moduleCapacityGb: 16,
+      speedMts: 5200,
+      casLatency: 40,
+    },
+    specSourceUrls: [DDR5_PAGE],
+    referencePriceCents: 139_990,
+  },
+  {
+    slug: "kingston-fury-beast-ddr4-3200-cl16-2x8gb",
+    category: "MEMORY",
+    brand: "Kingston",
+    model: "FURY Beast DDR4-3200 CL16 2x8GB (KF432C16BBK2/16)",
+    specs: {
+      type: "DDR4",
+      moduleCount: 2,
+      moduleCapacityGb: 8,
+      speedMts: 3200,
+      casLatency: 16,
+    },
+    specSourceUrls: [DDR4_PAGE],
+    referencePriceCents: 32_990,
+  },
+  {
+    slug: "kingston-fury-beast-ddr4-3200-cl16-2x16gb",
+    category: "MEMORY",
+    brand: "Kingston",
+    model: "FURY Beast DDR4-3200 CL16 2x16GB (KF432C16BBK2/32)",
+    specs: {
+      type: "DDR4",
+      moduleCount: 2,
+      moduleCapacityGb: 16,
+      speedMts: 3200,
+      casLatency: 16,
+    },
+    specSourceUrls: [DDR4_PAGE],
+    referencePriceCents: 54_990,
+  },
+];
