@@ -1,7 +1,8 @@
 import "server-only";
 import { connection } from "next/server";
 import { cache } from "react";
-import type { CatalogOffer } from "@/catalog/offers";
+import type { BuilderEntry } from "@/builder/entry";
+import { summarizeOffers, type CatalogOffer } from "@/catalog/offers";
 import { oldestVisibleSeenAt } from "@/domain/pricing/freshness";
 import { partSchema, type Category, type Part } from "@/domain/parts";
 import { getDb } from "./db";
@@ -95,3 +96,22 @@ export const getCatalogPart = cache(
     return { found: row ? toCatalogPart(row) : null, now };
   },
 );
+
+/**
+ * The whole catalog with summarized offers, for the builder. Cached per
+ * request so generateMetadata and the page share one query and one clock
+ * reading.
+ */
+export const getBuilderCatalog = cache(async (): Promise<BuilderEntry[]> => {
+  await connection();
+  const now = new Date();
+  const rows = await getDb().part.findMany({
+    include: offerInclude(now),
+    orderBy: [{ category: "asc" }, { brand: "asc" }, { model: "asc" }],
+  });
+  return rows.map((row) => {
+    const { part, offers } = toCatalogPart(row);
+    const summary = summarizeOffers(offers, now);
+    return { part, offers: summary.offers, price: summary.price };
+  });
+});

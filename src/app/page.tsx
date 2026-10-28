@@ -33,8 +33,14 @@ export default function Home() {
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <Link
-              href="/pecas"
+              href="/montar"
               className="rounded-panel bg-accent px-5 py-2.5 font-medium text-accent-ink hover:brightness-110"
+            >
+              Montar meu PC
+            </Link>
+            <Link
+              href="/pecas"
+              className="rounded-panel border border-line-strong px-5 py-2.5 font-medium hover:border-accent hover:text-accent"
             >
               Explorar peças
             </Link>

@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { notFound, permanentRedirect } from "next/navigation";
+import { paramOf } from "@/builder/url";
 import { categoryRoute, partPath } from "@/catalog/categories";
 import { summarizeOffers } from "@/catalog/offers";
 import { keySpecs, specRows } from "@/catalog/specs";
@@ -90,8 +92,14 @@ export default async function PartPage({ params }: Props) {
                 ))}
               </ul>
             </div>
-            <div className="w-full sm:w-auto sm:text-right">
+            <div className="flex w-full flex-col gap-3 sm:w-auto sm:items-end sm:text-right">
               <PriceTag price={summary.price} size="lg" />
+              <Link
+                href={`/montar?${paramOf(part.category)}=${part.slug}`}
+                className="rounded-panel border border-line-strong px-3 py-1.5 text-center text-sm whitespace-nowrap hover:border-accent hover:text-accent"
+              >
+                Montar com esta peça
+              </Link>
             </div>
           </header>
 

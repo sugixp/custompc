@@ -26,6 +26,14 @@ export function SiteHeader() {
                 Peças
               </Link>
             </li>
+            <li>
+              <Link
+                href="/montar"
+                className="rounded-panel px-3 py-2 text-muted transition-colors hover:bg-raised hover:text-text"
+              >
+                Montar PC
+              </Link>
+            </li>
           </ul>
         </nav>
       </div>
