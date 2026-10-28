@@ -79,6 +79,38 @@ test("builds a compatible PC from scratch", async ({ page }) => {
   await expect(page).toHaveURL(/gabinete=fractal-meshify-2-compact/);
 });
 
+test("picks a part with the keyboard alone", async ({ page, isMobile }) => {
+  test.skip(isMobile, "no physical keyboard on the mobile profile");
+  await page.goto("/montar");
+  await page.getByRole("button", { name: "Escolher (Processador)" }).focus();
+  await page.keyboard.press("Enter");
+
+  const dialog = page.getByRole("dialog", { name: "Escolher: Processador" });
+  await expect(dialog.getByLabel("Buscar")).toBeFocused();
+  await page.keyboard.type("7600");
+  // Search, then the "compatible only" checkbox, then the only result.
+  await page.keyboard.press("Tab");
+  await page.keyboard.press("Tab");
+  await expect(
+    dialog.getByRole("button", { name: "Escolher AMD Ryzen 5 7600" }),
+  ).toBeFocused();
+  await page.keyboard.press("Enter");
+
+  // The "+ Escolher" button is gone, so focus lands on its replacement.
+  await expect(dialog).toBeHidden();
+  await expect(slot(page, "CPU")).toContainText("AMD Ryzen 5 7600");
+  const swap = page.getByRole("button", { name: "Trocar Processador" });
+  await expect(swap).toBeFocused();
+
+  // Escape closes without changing anything and returns to the opener.
+  await page.keyboard.press("Enter");
+  await expect(dialog.getByLabel("Buscar")).toBeFocused();
+  await page.keyboard.press("Escape");
+  await expect(dialog).toBeHidden();
+  await expect(swap).toBeFocused();
+  await expect(slot(page, "CPU")).toContainText("AMD Ryzen 5 7600");
+});
+
 test("shows the issues of a seed scenario and highlights the parts", async ({
   page,
 }) => {
