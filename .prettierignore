@@ -4,3 +4,7 @@ playwright-report/
 test-results/
 package-lock.json
 next-env.d.ts
+
+# third-party agent skills, managed by `neon skills`
+.claude/skills/
+skills-lock.json
