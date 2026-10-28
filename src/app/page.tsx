@@ -2,6 +2,7 @@ import Link from "next/link";
 import { CategoryGrid } from "@/components/category-grid";
 import { CompatibilityExample } from "@/components/compatibility-example";
 import { DemoVideo } from "@/components/demo-video";
+import { SITE_TAGLINE } from "@/site";
 
 const STEPS = [
   {
@@ -25,7 +26,7 @@ export default function Home() {
         <div>
           <p className="spec-label text-accent">Montador de PC · Brasil</p>
           <h1 className="mt-3 max-w-3xl text-4xl leading-tight font-semibold tracking-tight text-balance sm:text-5xl">
-            Monte seu PC com preço em real e peças que se encaixam.
+            {SITE_TAGLINE}
           </h1>
           <p className="mt-5 max-w-2xl text-lg text-muted">
             Compare ofertas de lojas brasileiras e veja na hora se o

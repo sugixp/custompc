@@ -11,6 +11,10 @@ export const SITE_URL = new URL(
 
 export const SITE_NAME = "custompc";
 
+/** The home page headline, also on the default Open Graph image. */
+export const SITE_TAGLINE =
+  "Monte seu PC com preço em real e peças que se encaixam.";
+
 export const SITE_DESCRIPTION =
   "Monte seu PC com preços em reais, lojas brasileiras e verificação de compatibilidade entre as peças.";
 

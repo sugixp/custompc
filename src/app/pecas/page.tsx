@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { CategoryGrid } from "@/components/category-grid";
+import { DEFAULT_OG_IMAGE } from "@/og/size";
 
 const description =
   "Catálogo de peças para PC com especificações dos fabricantes e preços em lojas brasileiras.";
@@ -9,7 +10,12 @@ export const metadata: Metadata = {
   title: "Peças",
   description,
   alternates: { canonical: "/pecas" },
-  openGraph: { title: "Peças para PC", description, url: "/pecas" },
+  openGraph: {
+    title: "Peças para PC",
+    description,
+    url: "/pecas",
+    images: DEFAULT_OG_IMAGE,
+  },
 };
 
 export default function PartsIndexPage() {

@@ -1,67 +1,33 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
-import type { BuilderEntry } from "@/builder/entry";
-import { priceBuild } from "@/builder/pricing";
-import { resolveBuild } from "@/builder/resolve";
-import {
-  decodeBuild,
-  encodeBuild,
-  isMultiCategory,
-  toSearchParams,
-  type BuildSelection,
-} from "@/builder/url";
-import { CATEGORY_ROUTES } from "@/catalog/categories";
+import { summarizeSharedBuild } from "@/builder/share";
+import { encodeBuild, toSearchParams } from "@/builder/url";
 import { Builder } from "@/components/builder/builder";
-import { checkBuild } from "@/domain/compatibility";
 import { formatBRL } from "@/domain/money/money";
+import { DEFAULT_OG_IMAGE, OG_SIZE } from "@/og/size";
 import { scenarios } from "@/seed";
-import { getBuilderCatalog } from "@/server/catalog";
+import { loadBuild as loadBuildFrom } from "@/server/shared-build";
 
 type Props = PageProps<"/montar">;
 
 const DESCRIPTION =
   "Escolha as peças do seu PC, veja a compatibilidade na hora e compare o preço total em lojas brasileiras.";
 
-async function loadBuild(searchParams: Props["searchParams"]) {
-  const { selection, problems } = decodeBuild(
-    toSearchParams(await searchParams),
-  );
-  const entries = await getBuilderCatalog();
-  const bySlug = new Map(entries.map((entry) => [entry.part.slug, entry]));
-  const resolved = resolveBuild(selection, (slug) => bySlug.get(slug)?.part);
-  return {
-    entries,
-    bySlug,
-    resolved,
-    ignored: problems.length + resolved.unknown.length,
-  };
-}
+const loadBuild = async (searchParams: Props["searchParams"]) =>
+  loadBuildFrom(toSearchParams(await searchParams));
 
-function linesOf(selection: BuildSelection, bySlug: Map<string, BuilderEntry>) {
-  return CATEGORY_ROUTES.flatMap(({ category }) => {
-    const picked = isMultiCategory(category)
-      ? selection[category]
-      : selection[category]
-        ? [{ slug: selection[category], quantity: 1 }]
-        : [];
-    return picked.flatMap(({ slug, quantity }) => {
-      const entry = bySlug.get(slug);
-      return entry
-        ? [{ part: entry.part, quantity, offers: entry.offers }]
-        : [];
-    });
-  });
-}
-
-/** Title with CPU + GPU and a one-line summary, for shared build links. */
+/**
+ * Title with CPU + GPU, a one-line summary and a generated image
+ * (/montar/imagem) for shared build links. A link without known parts
+ * keeps the site's default image.
+ */
 export async function generateMetadata({
   searchParams,
 }: Props): Promise<Metadata> {
   const { bySlug, resolved } = await loadBuild(searchParams);
-  const { build, selection } = resolved;
-  const lines = linesOf(selection, bySlug);
-  if (lines.length === 0) {
+  const shared = summarizeSharedBuild(resolved, bySlug);
+  if (shared === null) {
     return {
       title: "Montar PC",
       description: DESCRIPTION,
@@ -70,29 +36,34 @@ export async function generateMetadata({
         title: "Montar PC",
         description: DESCRIPTION,
         url: "/montar",
+        images: DEFAULT_OG_IMAGE,
       },
     };
   }
 
-  const headline = [build.cpu, build.gpu]
+  const { units, totalCents, errors } = shared;
+  const headline = [shared.cpu, shared.gpu]
     .filter((part) => part !== undefined)
     .map((part) => part.model)
     .join(" + ");
-  const title = `Build: ${headline || `${lines.length} peças`}`;
-  const issues = checkBuild(build);
-  const errors = issues.filter((issue) => issue.severity === "error").length;
-  const total = priceBuild(lines).totalCents;
-  const units = lines.reduce((sum, line) => sum + line.quantity, 0);
-  const description = `${units} ${units === 1 ? "peça" : "peças"}, a partir de ${formatBRL(total)}. ${
+  const title = `Build: ${headline || `${shared.lines.length} peças`}`;
+  const description = `${units} ${units === 1 ? "peça" : "peças"}, a partir de ${formatBRL(totalCents)}. ${
     errors === 0
       ? "Sem erros de compatibilidade."
       : `${errors} ${errors === 1 ? "erro" : "erros"} de compatibilidade.`
   }`;
-  const url = `/montar?${encodeBuild(selection)}`;
+  const query = encodeBuild(resolved.selection);
+  const image = {
+    url: `/montar/imagem?${query}`,
+    width: OG_SIZE.width,
+    height: OG_SIZE.height,
+    alt: title,
+  };
   return {
     title,
     description,
-    openGraph: { title, description, url },
+    openGraph: { title, description, url: `/montar?${query}`, images: image },
+    twitter: { card: "summary_large_image", images: image },
     // Every build has its own URL; only the empty builder is canonical.
     robots: { index: false },
   };
