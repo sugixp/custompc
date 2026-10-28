@@ -11,9 +11,12 @@ src/pricing/   the PriceProvider contract, the provider registry and the
                port (enforced by ESLint).
 src/seed/      the example catalog: real parts, stores, illustrative offers,
                demo scenarios.
+src/catalog/   pure presentation logic for the catalog: category routes, pt-BR
+               spec formatting, facets, sorting, pagination, offer summaries.
 src/server/    server-side adapters: the Prisma client and the Prisma-backed
                OfferRepository.
-src/app/       Next.js App Router pages and components.
+src/app/       Next.js App Router pages; src/components holds their UI.
+src/proxy.ts   answers 404 for unknown category slugs before rendering.
 prisma/        schema, migrations and the seed script.
 scripts/       command-line entry points (price sync).
 ```
@@ -157,6 +160,20 @@ A private repository would:
 The sync never deletes offers. When a provider stops reporting one, it ages
 out on its own. The seed provider reports every offer as seen at sync time,
 so example prices stay fresh as long as the sync runs.
+
+## Rendering
+
+Next.js 16 with Cache Components. Static parts (home, category headings,
+filters' surroundings) are prerendered; anything that reads the database,
+`searchParams` or the clock streams inside `<Suspense>`, so the build never
+needs a database. Filters, sort and page live in the URL (`?soquete=AM5&
+ordem=nome&pagina=2`) through a plain GET form that works without
+JavaScript.
+
+Because pages stream, a `notFound()` raised while rendering arrives after the
+200 status. Unknown categories are a fixed list, so `src/proxy.ts` rejects
+them up front with a real 404. Unknown part slugs need the database and
+render the not-found page with status 200 and `noindex`.
 
 ## Data model
 

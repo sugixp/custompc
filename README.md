@@ -9,6 +9,15 @@ Monte seu PC com **preços em reais**, links para **lojas brasileiras** e
 
 > 🚧 Em construção — Fase 1 (MVP) em andamento.
 
+## Telas
+
+| Desktop                                                                                          | Celular                                                          |
+| ------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------- |
+| ![Catálogo de processadores com filtros e preços em reais](docs/screenshots/listing-desktop.png) | ![Catálogo no celular](docs/screenshots/listing-mobile.png)      |
+| ![Página da peça com ofertas por loja e ficha técnica](docs/screenshots/detail-desktop.png)      | ![Página da peça no celular](docs/screenshots/detail-mobile.png) |
+
+![Página inicial com um exemplo real de verificação de compatibilidade](docs/screenshots/home-desktop.png)
+
 ## Por que o foco no Brasil
 
 Os montadores de PC mais conhecidos mostram preços em dólar e lojas dos EUA.
@@ -49,19 +58,21 @@ volume `custompc-db`).
 
 ## Scripts
 
-| Comando               | O que faz                                            |
-| --------------------- | ---------------------------------------------------- |
-| `npm run dev`         | Servidor de desenvolvimento                          |
-| `npm run lint`        | ESLint                                               |
-| `npm run typecheck`   | Checagem de tipos do TypeScript                      |
-| `npm test`            | Testes unitários (Vitest)                            |
-| `npm run format`      | Formata o código com Prettier                        |
-| `npm run db:up`       | Sobe o Postgres (Docker)                             |
-| `npm run db:deploy`   | Aplica as migrations                                 |
-| `npm run db:migrate`  | Cria uma migration (desenvolvimento)                 |
-| `npm run db:seed`     | Carrega os dados de exemplo                          |
-| `npm run db:reset`    | Recria o banco e roda o seed                         |
-| `npm run prices:sync` | Atualiza as ofertas a partir dos provedores de preço |
+| Comando               | O que faz                                              |
+| --------------------- | ------------------------------------------------------ |
+| `npm run dev`         | Servidor de desenvolvimento                            |
+| `npm run lint`        | ESLint                                                 |
+| `npm run typecheck`   | Checagem de tipos do TypeScript                        |
+| `npm test`            | Testes unitários (Vitest)                              |
+| `npm run test:e2e`    | Testes E2E (Playwright; requer build e banco com seed) |
+| `npm run screenshots` | Gera os screenshots em `docs/screenshots`              |
+| `npm run format`      | Formata o código com Prettier                          |
+| `npm run db:up`       | Sobe o Postgres (Docker)                               |
+| `npm run db:deploy`   | Aplica as migrations                                   |
+| `npm run db:migrate`  | Cria uma migration (desenvolvimento)                   |
+| `npm run db:seed`     | Carrega os dados de exemplo                            |
+| `npm run db:reset`    | Recria o banco e roda o seed                           |
+| `npm run prices:sync` | Atualiza as ofertas a partir dos provedores de preço   |
 
 ## Arquitetura
 
@@ -100,6 +111,12 @@ Build your PC with **prices in Brazilian reais (R$)**, links to **Brazilian
 stores** and **compatibility checks** between parts.
 
 > 🚧 Work in progress — Phase 1 (MVP) under way.
+
+### Screenshots
+
+See the table above: the catalog with filters and prices in reais, a part
+page with store offers and its spec sheet, and the home page with a real
+compatibility check on seed parts.
 
 ### Why Brazil
 
