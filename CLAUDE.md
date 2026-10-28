@@ -63,10 +63,14 @@ npm run build && npm run start -- -p 3100   # in another terminal
 npm run screenshots                          # writes docs/screenshots
 ```
 
+The README GIF comes from `npm run demo:gif` (needs `ffmpeg` on PATH),
+against the same server or, with `SCREENSHOT_BASE_URL`, production.
+
 Deploy (details in docs/architecture.md, "Deployment"): Vercel builds with
-`vercel-build`, which migrates only when `VERCEL_ENV=production` and never
-seeds. Production data comes from `npm run db:seed:prod` (reads
-`PRODUCTION_DATABASE_URL`) or the "Seed production" workflow; prices from
+`vercel-build`, which migrates production and each preview's own Neon
+branch (never production from a preview) and never seeds. Production data
+comes from `npm run db:seed:prod` (reads `PRODUCTION_DATABASE_URL`) or the
+"Seed production" workflow; prices from
 the daily "Price sync" workflow. Both workflows use the
 `PRODUCTION_DATABASE_URL` repository secret.
 

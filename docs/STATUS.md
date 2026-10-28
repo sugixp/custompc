@@ -1,11 +1,11 @@
 # Status
 
 Where the project stands, why it is built this way, and what comes next.
-Last updated 2026-10-28, at the end of Phase 1 stage 9.
+Last updated 2026-10-28, at the end of Phase 1 (stage 10).
 
 ## Where it stands
 
-Phase 1 (MVP), stages 1–9 of 10 are done and on `main`, CI green:
+Phase 1 (MVP) is done: all 10 stages are on `main`, CI green:
 
 | Stage | What                                                                 |
 | ----- | -------------------------------------------------------------------- |
@@ -18,6 +18,7 @@ Phase 1 (MVP), stages 1–9 of 10 are done and on `main`, CI green:
 | 7     | Catalog UI (listing with URL filters, part pages), Playwright        |
 | 8     | Builder at `/montar`: URL state, live checks, totals, shareable link |
 | 9     | E2E on its own database: keyboard, axe, offer age, errors, paging    |
+| 10    | Deploy (Vercel + Neon), final README (PT/EN) with the builder GIF    |
 
 Deployed at https://custompc-six.vercel.app (Vercel + Neon, São Paulo),
 with example prices refreshed daily.
@@ -97,13 +98,11 @@ unreachable.
 
 ## Next steps
 
-1. **Stage 10 — final README** (PT/EN) for recruiters: GIF of the builder,
-   architecture summary, how to run and test, roadmap and status.
-2. **BIOS-update scenario on real parts** is still missing. ASUS, MSI and
+1. **BIOS-update scenario on real parts** is still missing. ASUS, MSI and
    Gigabyte block automated access to CPU support lists; it needs a list
    checked by hand (or a PDF) before `supportedCpus` can be filled.
-3. **Check the store search links by hand** in a browser. Only KaBuM!
+2. **Check the store search links by hand** in a browser. Only KaBuM!
    answered `curl`; Amazon, Mercado Livre, Pichau and Terabyte block bots.
-4. **Phase 2**: sign-up/login (Auth.js: email + hashed password, Google,
+3. **Phase 2**: sign-up/login (Auth.js: email + hashed password, Google,
    GitHub), saved builds and favorite parts, privacy policy page (LGPD,
    minimal user data).
