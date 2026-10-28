@@ -100,3 +100,55 @@ jobs:
           echo "before: $before / after: $after"
           test "$before" = "$after"
           test "$(echo $before | cut -d' ' -f1)" -gt 0
+
+  e2e:
+    name: End-to-end tests (Playwright)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    services:
+      postgres:
+        image: postgres:18.6-alpine
+        env:
+          POSTGRES_USER: custompc
+          POSTGRES_PASSWORD: custompc
+          POSTGRES_DB: custompc
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U custompc -d custompc"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      DATABASE_URL: postgresql://custompc:custompc@localhost:5432/custompc
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - run: npm ci
+
+      - name: Prepare the database
+        run: |
+          npm run db:deploy
+          npm run db:seed
+
+      - name: Build
+        run: npm run build
+
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Run Playwright
+        run: npm run test:e2e
+
+      - name: Upload the Playwright report
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7
