@@ -1,7 +1,8 @@
 # Status
 
 Where the project stands, why it is built this way, and what comes next.
-Last updated 2026-10-28, at the end of Phase 1 (stage 10).
+Last updated 2026-10-28, after Phase 1 (stage 10), with the home page demo video and the
+processor icon.
 
 ## Where it stands
 
@@ -94,7 +95,15 @@ unreachable.
 - **Visual direction** (chosen by the owner): dark "night panel" with
   datasheet typography: IBM Plex Sans/Mono, tabular figures, one lime
   accent `#b6f23a`, spec rows with dotted leaders. All text colors clear
-  WCAG AA (lowest pair 6.4:1).
+  WCAG AA (lowest pair 6.4:1). The mark is an original processor glyph
+  (`ChipMark`), also the favicon (`app/icon.svg`, on a dark tile) and the
+  Apple touch icon.
+- **Home page demo video:** the README GIF, MP4, WebM and poster all come
+  from one recording (`npm run demo:media`). It plays muted and inline
+  from script, not the `autoplay` attribute, so with
+  `prefers-reduced-motion` only the poster shows and the video is never
+  downloaded; a button pauses it (WCAG 2.2.2) and the caption describes
+  it, so the video is `aria-hidden`.
 
 ## Next steps
 
