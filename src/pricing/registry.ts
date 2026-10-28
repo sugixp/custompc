@@ -1,3 +1,5 @@
+import { resolve } from "node:path";
+import { pathToFileURL } from "node:url";
 import type { PriceProvider } from "./price-provider";
 import { seedPriceProvider } from "./providers/seed-provider";
 
@@ -9,6 +11,7 @@ import { seedPriceProvider } from "./providers/seed-provider";
  *   PRICE_PROVIDERS unset                          -> seed
  *   PRICE_PROVIDERS="@sugixp/custompc-prices"       -> only the private one
  *   PRICE_PROVIDERS="seed,@sugixp/custompc-prices"  -> both
+ *   PRICE_PROVIDERS="./e2e/fixtures/aged-offers.ts" -> a local file
  *
  * Provider packages are loaded with a dynamic import only when listed, so
  * build, tests and CI never need them. A package default-exports a
@@ -40,7 +43,7 @@ export async function loadPriceProviders(
     }
     let loaded: { default?: unknown };
     try {
-      loaded = await importModule(entry);
+      loaded = await importModule(toSpecifier(entry));
     } catch (error) {
       throw new Error(
         `PRICE_PROVIDERS lists "${entry}", but it could not be loaded. Is the package installed?`,
@@ -55,6 +58,16 @@ export async function loadPriceProviders(
   if (duplicate)
     throw new Error(`Two price providers share the id "${duplicate}"`);
   return providers;
+}
+
+/**
+ * A relative path is read from the working directory, where the command runs,
+ * not from this file, as import() would; anything else is a package name.
+ */
+function toSpecifier(entry: string): string {
+  return entry.startsWith("./") || entry.startsWith("../")
+    ? pathToFileURL(resolve(entry)).href
+    : entry;
 }
 
 async function toProviders(

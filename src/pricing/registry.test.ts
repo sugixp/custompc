@@ -1,3 +1,5 @@
+import { resolve } from "node:path";
+import { pathToFileURL } from "node:url";
 import { describe, expect, it } from "vitest";
 import type { PriceProvider } from "./price-provider";
 import { seedPriceProvider } from "./providers/seed-provider";
@@ -40,6 +42,19 @@ describe("loadPriceProviders", () => {
     const providers = await loadPriceProviders("@acme/prices", importModule);
     expect(providers).toEqual([privateProvider]);
     expect(requested).toEqual(["@acme/prices"]);
+  });
+
+  it("reads a relative path from the working directory", async () => {
+    const url = pathToFileURL(resolve("e2e/fixtures/provider.ts")).href;
+    const { importModule, requested } = fakeImporter({
+      [url]: privateProvider,
+    });
+    const providers = await loadPriceProviders(
+      "./e2e/fixtures/provider.ts",
+      importModule,
+    );
+    expect(providers).toEqual([privateProvider]);
+    expect(requested).toEqual([url]);
   });
 
   it("keeps the configured order and can mix built-in and packages", async () => {
