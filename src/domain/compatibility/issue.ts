@@ -25,6 +25,7 @@ export const IssueCode = {
   PsuLowHeadroom: "PSU_LOW_HEADROOM",
   GpuPowerConnectorsMissing: "GPU_POWER_CONNECTORS_MISSING",
   NoGraphicsOutput: "NO_GRAPHICS_OUTPUT",
+  NoCooler: "NO_COOLER",
   MissingRequiredParts: "MISSING_REQUIRED_PARTS",
 } as const;
 

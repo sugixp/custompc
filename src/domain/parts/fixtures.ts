@@ -27,6 +27,7 @@ export const cpu: Cpu = {
     tdpW: 65,
     maxPowerW: 88,
     integratedGraphics: true,
+    includesCooler: true,
     memoryTypes: ["DDR5"],
   },
 };

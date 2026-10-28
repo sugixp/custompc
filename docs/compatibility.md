@@ -22,33 +22,35 @@ A rule only runs when every part it needs is picked; otherwise it reports
 nothing. A build without a PSU gets no power issues, for example. The one
 exception is `MISSING_REQUIRED_PARTS`, a single warning listing the required
 categories still missing: CPU, motherboard, memory, storage, PSU and case.
-The GPU is optional (integrated graphics) and so is the cooler (many CPUs
-ship with one).
+The GPU is optional (integrated graphics; `NO_GRAPHICS_OUTPUT` warns when
+the CPU has none) and so is the cooler (many CPUs ship with one; `NO_COOLER`
+warns when the CPU does not).
 
 ## Rules
 
-| Code                                  | Severity | Categories             | When                                                                   |
-| ------------------------------------- | -------- | ---------------------- | ---------------------------------------------------------------------- |
-| `CPU_SOCKET_MISMATCH`                 | error    | CPU, motherboard       | CPU and board sockets differ                                           |
-| `CPU_NOT_IN_SUPPORT_LIST`             | warning  | CPU, motherboard       | Same socket, but the CPU is missing from the board's support list      |
-| `CPU_REQUIRES_BIOS_UPDATE`            | warning  | CPU, motherboard       | Listed as supported, flagged `requiresBiosUpdate`                      |
-| `MEMORY_TYPE_MISMATCH`                | error    | memory, motherboard    | A kit's DDR generation differs from the board's                        |
-| `MEMORY_SLOTS_EXCEEDED`               | error    | memory, motherboard    | Total modules across kits > memory slots                               |
-| `MEMORY_CAPACITY_EXCEEDED`            | error    | memory, motherboard    | Total GB across kits > board maximum                                   |
-| `MOTHERBOARD_FORM_FACTOR_UNSUPPORTED` | error    | motherboard, case      | Case does not list the board's form factor                             |
-| `PSU_FORM_FACTOR_UNSUPPORTED`         | error    | PSU, case              | Case does not list the PSU's form factor (ATX, SFX, SFX-L)             |
-| `GPU_TOO_LONG`                        | error    | GPU, case              | GPU length > case GPU clearance                                        |
-| `COOLER_TOO_TALL`                     | error    | cooler, case           | Air cooler height > case cooler clearance (not checked for AIOs)       |
-| `RADIATOR_UNSUPPORTED`                | error    | cooler, case           | AIO radiator size not among the case's supported sizes                 |
-| `COOLER_SOCKET_UNSUPPORTED`           | error    | cooler, CPU or board   | Cooler lacks the CPU's socket (or the board's, before a CPU is picked) |
-| `COOLER_UNDERRATED`                   | warning  | cooler, CPU            | Cooler's published rating < CPU TDP                                    |
-| `M2_SLOTS_EXCEEDED`                   | error    | storage, motherboard   | M.2 drives (NVMe or SATA) > M.2 slots                                  |
-| `SATA_PORTS_EXCEEDED`                 | error    | storage, motherboard   | 2.5in/3.5in drives > SATA ports                                        |
-| `PSU_INSUFFICIENT`                    | error    | PSU, CPU (, GPU)       | PSU wattage < estimated draw                                           |
-| `PSU_LOW_HEADROOM`                    | warning  | PSU, CPU (, GPU)       | PSU wattage < recommended wattage (below)                              |
-| `GPU_POWER_CONNECTORS_MISSING`        | warning  | GPU, PSU               | PSU has fewer 12V-2x6/12VHPWR or 8-pin PCIe connectors than the GPU    |
-| `NO_GRAPHICS_OUTPUT`                  | warning  | CPU, GPU               | CPU has no integrated graphics and no GPU is picked                    |
-| `MISSING_REQUIRED_PARTS`              | warning  | the missing categories | A required category has no part yet                                    |
+| Code                                  | Severity | Categories             | When                                                                    |
+| ------------------------------------- | -------- | ---------------------- | ----------------------------------------------------------------------- |
+| `CPU_SOCKET_MISMATCH`                 | error    | CPU, motherboard       | CPU and board sockets differ                                            |
+| `CPU_NOT_IN_SUPPORT_LIST`             | warning  | CPU, motherboard       | Same socket, but the CPU is missing from the board's support list       |
+| `CPU_REQUIRES_BIOS_UPDATE`            | warning  | CPU, motherboard       | Listed as supported, flagged `requiresBiosUpdate`                       |
+| `MEMORY_TYPE_MISMATCH`                | error    | memory, motherboard    | A kit's DDR generation differs from the board's                         |
+| `MEMORY_SLOTS_EXCEEDED`               | error    | memory, motherboard    | Total modules across kits > memory slots                                |
+| `MEMORY_CAPACITY_EXCEEDED`            | error    | memory, motherboard    | Total GB across kits > board maximum                                    |
+| `MOTHERBOARD_FORM_FACTOR_UNSUPPORTED` | error    | motherboard, case      | Case does not list the board's form factor                              |
+| `PSU_FORM_FACTOR_UNSUPPORTED`         | error    | PSU, case              | Case does not list the PSU's form factor (ATX, SFX, SFX-L)              |
+| `GPU_TOO_LONG`                        | error    | GPU, case              | GPU length > case GPU clearance                                         |
+| `COOLER_TOO_TALL`                     | error    | cooler, case           | Air cooler height > case cooler clearance (not checked for AIOs)        |
+| `RADIATOR_UNSUPPORTED`                | error    | cooler, case           | AIO radiator size not among the case's supported sizes                  |
+| `COOLER_SOCKET_UNSUPPORTED`           | error    | cooler, CPU or board   | Cooler lacks the CPU's socket (or the board's, before a CPU is picked)  |
+| `COOLER_UNDERRATED`                   | warning  | cooler, CPU            | Cooler's published rating < CPU TDP                                     |
+| `M2_SLOTS_EXCEEDED`                   | error    | storage, motherboard   | M.2 drives (NVMe or SATA) > M.2 slots                                   |
+| `SATA_PORTS_EXCEEDED`                 | error    | storage, motherboard   | 2.5in/3.5in drives > SATA ports                                         |
+| `PSU_INSUFFICIENT`                    | error    | PSU, CPU (, GPU)       | PSU wattage < estimated draw                                            |
+| `PSU_LOW_HEADROOM`                    | warning  | PSU, CPU (, GPU)       | PSU wattage < recommended wattage (below)                               |
+| `GPU_POWER_CONNECTORS_MISSING`        | warning  | GPU, PSU               | PSU has fewer 12V-2x6/12VHPWR or 8-pin PCIe connectors than the GPU     |
+| `NO_GRAPHICS_OUTPUT`                  | warning  | CPU, GPU               | CPU has no integrated graphics and no GPU is picked                     |
+| `NO_COOLER`                           | warning  | CPU, cooler            | CPU ships without a cooler (`includesCooler: false`) and none is picked |
+| `MISSING_REQUIRED_PARTS`              | warning  | the missing categories | A required category has no part yet                                     |
 
 Some checks are warnings on purpose. Support lists and BIOS versions vary by
 board revision and stock, adapters exist for GPU power connectors, and

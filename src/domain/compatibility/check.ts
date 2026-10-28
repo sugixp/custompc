@@ -7,7 +7,11 @@ import {
   caseFitsPsu,
   caseFitsRadiator,
 } from "./rules/case";
-import { noGraphicsOutput, requiredPartsPicked } from "./rules/completeness";
+import {
+  noCooler,
+  noGraphicsOutput,
+  requiredPartsPicked,
+} from "./rules/completeness";
 import { coolerHandlesCpuHeat, coolerSupportsSocket } from "./rules/cooler";
 import {
   cpuInMotherboardSupportList,
@@ -40,6 +44,7 @@ export const RULES: readonly Rule[] = [
   psuCoversPower,
   psuHasGpuConnectors,
   noGraphicsOutput,
+  noCooler,
   requiredPartsPicked,
 ];
 

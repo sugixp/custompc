@@ -9,6 +9,7 @@ import {
   type ExpectedIssue,
 } from "../test-helpers";
 import {
+  noCooler,
   noGraphicsOutput,
   REQUIRED_CATEGORIES,
   requiredPartsPicked,
@@ -65,5 +66,21 @@ describe("noGraphicsOutput", () => {
     ["no CPU yet", { cpu: undefined, gpu: undefined }, []],
   ])("%s", (_, overrides, expected) => {
     expectIssues(noGraphicsOutput, fullBuild(overrides), expected);
+  });
+});
+
+describe("noCooler", () => {
+  const trayCpu = withSpecs(fx.cpu, { includesCooler: false });
+  it.each<Row>([
+    ["boxed cooler, none picked", { cooler: undefined }, []],
+    ["no boxed cooler, cooler picked", { cpu: trayCpu }, []],
+    [
+      "no boxed cooler, none picked",
+      { cpu: trayCpu, cooler: undefined },
+      [{ code: IssueCode.NoCooler, categories: ["CPU", "COOLER"] }],
+    ],
+    ["no CPU yet", { cpu: undefined, cooler: undefined }, []],
+  ])("%s", (_, overrides, expected) => {
+    expectIssues(noCooler, fullBuild(overrides), expected);
   });
 });

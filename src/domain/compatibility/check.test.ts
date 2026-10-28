@@ -99,8 +99,10 @@ describe("RULES", () => {
           integratedGraphics: false,
           tdpW: 250,
           maxPowerW: 253,
+          includesCooler: false,
         }),
         gpu: undefined,
+        cooler: undefined,
       }),
       fullBuild({
         motherboard: withSpecs(fx.motherboard, { supportedCpus: [] }),

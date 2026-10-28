@@ -52,6 +52,8 @@ export const cpuSpecsSchema = z
     /** Sustained peak draw: Intel PL2 or AMD PPT. Falls back to tdpW. */
     maxPowerW: positiveInt.optional(),
     integratedGraphics: z.boolean(),
+    /** Whether a stock cooler ships in the box. */
+    includesCooler: z.boolean(),
     memoryTypes: z.array(memoryTypeSchema).min(1),
   })
   .refine((cpu) => cpu.threads >= cpu.cores, {

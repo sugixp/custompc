@@ -4,7 +4,8 @@ import { IssueCode, warning, type Rule } from "../issue";
 
 /**
  * Parts a PC cannot boot without. The GPU is optional (integrated graphics,
- * see noGraphicsOutput) and so is the cooler, since many CPUs ship with one.
+ * see noGraphicsOutput) and so is the cooler, since many CPUs ship with one
+ * (see noCooler).
  */
 export const REQUIRED_CATEGORIES = [
   "CPU",
@@ -50,6 +51,17 @@ export const noGraphicsOutput: Rule = ({ cpu, gpu }) => {
       IssueCode.NoGraphicsOutput,
       ["CPU", "GPU"],
       `O ${cpu.model} não tem vídeo integrado. Sem placa de vídeo, o PC não terá saída de imagem.`,
+    ),
+  ];
+};
+
+export const noCooler: Rule = ({ cpu, cooler }) => {
+  if (!cpu || cooler || cpu.specs.includesCooler) return [];
+  return [
+    warning(
+      IssueCode.NoCooler,
+      ["CPU", "COOLER"],
+      `O ${cpu.model} não vem com cooler na caixa. Escolha um cooler para o processador.`,
     ),
   ];
 };
