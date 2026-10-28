@@ -48,9 +48,13 @@ npm run dev                 # http://localhost:3000
 
 On the owner's machine a native Postgres holds 5432, so `.env` uses 5433.
 
-E2E and screenshots run against a production build on port 3100:
+E2E and screenshots run against a production build on port 3100. The
+offer specs also need some offers aged by a test provider (a later
+`db:seed` makes them fresh again); Playwright starts a second server on
+3101 with an unreachable database for the error-page spec:
 
 ```bash
+PRICE_PROVIDERS=./e2e/fixtures/aged-offers.ts npm run prices:sync
 npm run build && npm run start -- -p 3100   # in another terminal
 npm run test:e2e
 npm run screenshots                          # writes docs/screenshots

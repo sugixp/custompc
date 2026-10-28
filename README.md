@@ -59,21 +59,21 @@ volume `custompc-db`).
 
 ## Scripts
 
-| Comando               | O que faz                                              |
-| --------------------- | ------------------------------------------------------ |
-| `npm run dev`         | Servidor de desenvolvimento                            |
-| `npm run lint`        | ESLint                                                 |
-| `npm run typecheck`   | Checagem de tipos do TypeScript                        |
-| `npm test`            | Testes unitários (Vitest)                              |
-| `npm run test:e2e`    | Testes E2E (Playwright; requer build e banco com seed) |
-| `npm run screenshots` | Gera os screenshots em `docs/screenshots`              |
-| `npm run format`      | Formata o código com Prettier                          |
-| `npm run db:up`       | Sobe o Postgres (Docker)                               |
-| `npm run db:deploy`   | Aplica as migrations                                   |
-| `npm run db:migrate`  | Cria uma migration (desenvolvimento)                   |
-| `npm run db:seed`     | Carrega os dados de exemplo                            |
-| `npm run db:reset`    | Recria o banco e roda o seed                           |
-| `npm run prices:sync` | Atualiza as ofertas a partir dos provedores de preço   |
+| Comando               | O que faz                                            |
+| --------------------- | ---------------------------------------------------- |
+| `npm run dev`         | Servidor de desenvolvimento                          |
+| `npm run lint`        | ESLint                                               |
+| `npm run typecheck`   | Checagem de tipos do TypeScript                      |
+| `npm test`            | Testes unitários (Vitest)                            |
+| `npm run test:e2e`    | Testes E2E e de acessibilidade (Playwright + axe)    |
+| `npm run screenshots` | Gera os screenshots em `docs/screenshots`            |
+| `npm run format`      | Formata o código com Prettier                        |
+| `npm run db:up`       | Sobe o Postgres (Docker)                             |
+| `npm run db:deploy`   | Aplica as migrations                                 |
+| `npm run db:migrate`  | Cria uma migration (desenvolvimento)                 |
+| `npm run db:seed`     | Carrega os dados de exemplo                          |
+| `npm run db:reset`    | Recria o banco e roda o seed                         |
+| `npm run prices:sync` | Atualiza as ofertas a partir dos provedores de preço |
 
 ## Status
 
@@ -82,7 +82,9 @@ volume `custompc-db`).
   loja, consumo e fonte recomendada, link compartilhável.
 - ✅ 20 regras de compatibilidade com testes; 43 peças reais com specs dos
   fabricantes; preços de exemplo.
-- ⏳ Próximo: E2E completos no CI, README final, deploy (Vercel + Neon).
+- ✅ E2E no CI (desktop e celular): teclado, acessibilidade (axe), ofertas
+  desatualizadas e banco fora do ar.
+- ⏳ Próximo: README final, deploy (Vercel + Neon).
 
 ## Arquitetura
 
@@ -136,7 +138,8 @@ compatibility check on seed parts.
 
 Catalog, part pages and the builder at `/montar` work end to end on example
 prices: live compatibility, total and per-store totals, power estimate and a
-shareable link. Next: full E2E in CI, final README and deploy.
+shareable link. E2E and axe accessibility checks run in CI on desktop and
+mobile. Next: final README and deploy.
 
 ### Why Brazil
 

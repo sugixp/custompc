@@ -92,11 +92,12 @@ database, so a slow or blocked store can never slow down or break the site.
 `PRICE_PROVIDERS` is a comma-separated list of `seed` (the built-in example
 provider) and module specifiers of installed provider packages:
 
-| `PRICE_PROVIDERS`              | Providers run                  |
-| ------------------------------ | ------------------------------ |
-| unset                          | `seed`                         |
-| `@sugixp/custompc-prices`      | only the private package       |
-| `seed,@sugixp/custompc-prices` | both; on a tie, the first wins |
+| `PRICE_PROVIDERS`               | Providers run                                       |
+| ------------------------------- | --------------------------------------------------- |
+| unset                           | `seed`                                              |
+| `@sugixp/custompc-prices`       | only the private package                            |
+| `seed,@sugixp/custompc-prices`  | both; on a tie, the first wins                      |
+| `./e2e/fixtures/aged-offers.ts` | a local file, from the working directory (E2E only) |
 
 A listed package that is not installed fails the sync with a clear message
 instead of silently falling back to example prices.

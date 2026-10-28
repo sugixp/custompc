@@ -1,11 +1,11 @@
 # Status
 
 Where the project stands, why it is built this way, and what comes next.
-Last updated 2026-10-28, at the end of Phase 1 stage 8.
+Last updated 2026-10-28, at the end of Phase 1 stage 9.
 
 ## Where it stands
 
-Phase 1 (MVP), stages 1–8 of 10 are done and on `main`, CI green:
+Phase 1 (MVP), stages 1–9 of 10 are done and on `main`, CI green:
 
 | Stage | What                                                                 |
 | ----- | -------------------------------------------------------------------- |
@@ -17,10 +17,13 @@ Phase 1 (MVP), stages 1–8 of 10 are done and on `main`, CI green:
 | 6     | `PriceProvider` boundary, `prices:sync`, offer freshness             |
 | 7     | Catalog UI (listing with URL filters, part pages), Playwright        |
 | 8     | Builder at `/montar`: URL state, live checks, totals, shareable link |
+| 9     | E2E: keyboard, axe, stale/expired offers, database down, pagination  |
 
 CI runs three jobs on every push: lint/format/typecheck/unit tests/build
 (no database), migrate + seed + sync + idempotency on a fresh Postgres, and
-Playwright E2E (desktop and Pixel 7) against a seeded production build.
+Playwright E2E (desktop and Pixel 7) against a seeded production build,
+with some offers aged by a test provider and a second server whose
+database is unreachable.
 
 ## Decisions and why
 
@@ -56,6 +59,17 @@ Playwright E2E (desktop and Pixel 7) against a seeded production build.
 - **Prisma pinned to 7.10.1:** npm's `latest` tag points at a Prisma 8
   release candidate. npm 11 blocks install scripts; `allowScripts` in
   package.json allows Prisma's, pinned to that version.
+- **E2E data comes through the real paths.** Stale and expired offers come
+  from a test-only `PriceProvider` (`e2e/fixtures/aged-offers.ts`) run by
+  `prices:sync`, not from rows written by the tests; it ages only coolers,
+  which no other spec prices. The error page is tested on a second
+  `next start` of the same build with an unreachable `DATABASE_URL`.
+- **Pagination has no E2E for page 2.** No seed category reaches 12 parts
+  and parts are never invented, so E2E covers only bad page numbers; the
+  page math is unit-tested.
+- **Picker focus:** it opens on the search box, and after the first pick
+  of a single-part slot focus goes to that slot's "Trocar" (the opener is
+  gone). Found by the keyboard E2E.
 - **Visual direction** (chosen by the owner): dark "night panel" with
   datasheet typography: IBM Plex Sans/Mono, tabular figures, one lime
   accent `#b6f23a`, spec rows with dotted leaders. All text colors clear
@@ -63,18 +77,15 @@ Playwright E2E (desktop and Pixel 7) against a seeded production build.
 
 ## Next steps
 
-1. **Stage 9 — E2E in CI, complete.** Broaden Playwright beyond the current
-   specs (keyboard navigation through the picker, error boundary, stale and
-   expired offers via a test provider, pagination), maybe axe checks.
-2. **Stage 10 — final README** (PT/EN) for recruiters: GIF of the builder,
+1. **Stage 10 — final README** (PT/EN) for recruiters: GIF of the builder,
    architecture summary, how to run and test, roadmap and status.
-3. **BIOS-update scenario on real parts** is still missing. ASUS, MSI and
+2. **BIOS-update scenario on real parts** is still missing. ASUS, MSI and
    Gigabyte block automated access to CPU support lists; it needs a list
    checked by hand (or a PDF) before `supportedCpus` can be filled.
-4. **Check the store search links by hand** in a browser. Only KaBuM!
+3. **Check the store search links by hand** in a browser. Only KaBuM!
    answered `curl`; Amazon, Mercado Livre, Pichau and Terabyte block bots.
-5. **Deploy**: Vercel + Neon. Needs the owner's accounts; set
+4. **Deploy**: Vercel + Neon. Needs the owner's accounts; set
    `DATABASE_URL`, `NEXT_PUBLIC_SITE_URL`, run `db:deploy`, `db:seed`.
-6. **Phase 2**: sign-up/login (Auth.js: email + hashed password, Google,
+5. **Phase 2**: sign-up/login (Auth.js: email + hashed password, Google,
    GitHub), saved builds and favorite parts, privacy policy page (LGPD,
    minimal user data).
