@@ -36,6 +36,7 @@ export function PartPicker({
   onClose: () => void;
 }) {
   const dialogRef = useRef<HTMLDialogElement>(null);
+  const searchRef = useRef<HTMLInputElement>(null);
   const titleId = useId();
   const [query, setQuery] = useState("");
   const [compatibleOnly, setCompatibleOnly] = useState(true);
@@ -46,6 +47,8 @@ export function PartPicker({
     if (category && !dialog.open) {
       setQuery("");
       dialog.showModal();
+      // showModal focuses the first control, "Fechar"; start at the search.
+      searchRef.current?.focus();
     } else if (!category && dialog.open) dialog.close();
   }, [category]);
 
@@ -100,6 +103,7 @@ export function PartPicker({
               Buscar
             </label>
             <input
+              ref={searchRef}
               id={`${titleId}-busca`}
               type="search"
               value={query}

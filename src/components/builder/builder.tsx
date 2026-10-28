@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { BuilderEntry } from "@/builder/entry";
 import { priceBuild, type PricedLine } from "@/builder/pricing";
 import { resolveBuild } from "@/builder/resolve";
@@ -43,6 +43,8 @@ export function Builder({
 }) {
   const [selection, setSelection] = useState(initialSelection);
   const [picking, setPicking] = useState<Category | null>(null);
+  const slotsRef = useRef<HTMLUListElement>(null);
+  const focusAfterPick = useRef<Category | null>(null);
 
   const bySlug = useMemo(
     () => new Map(entries.map((entry) => [entry.part.slug, entry])),
@@ -83,6 +85,18 @@ export function Builder({
     }
   }, [selection]);
 
+  // The first pick of a single-part slot unmounts the button that opened the
+  // picker, so the dialog has nowhere to return focus; send it to "Trocar".
+  // Runs after the picker's own effect has closed the dialog.
+  useEffect(() => {
+    const category = focusAfterPick.current;
+    if (!category) return;
+    focusAfterPick.current = null;
+    slotsRef.current
+      ?.querySelector<HTMLElement>(`[data-category="${category}"] [data-swap]`)
+      ?.focus();
+  }, [selection]);
+
   // The worst severity touching each category, to highlight its slot.
   const flagged = new Map<Category, Severity>();
   for (const issue of issues) {
@@ -103,7 +117,7 @@ export function Builder({
         <h2 id="pecas-da-build" className="sr-only">
           Peças da build
         </h2>
-        <ul className="space-y-3">
+        <ul ref={slotsRef} className="space-y-3">
           {CATEGORY_ROUTES.map(({ category }) => {
             const severity = flagged.get(category);
             const border =
@@ -247,6 +261,7 @@ export function Builder({
                               <button
                                 type="button"
                                 onClick={() => setPicking(category)}
+                                data-swap
                                 aria-label={`Trocar ${CATEGORY_LABELS[category]}`}
                                 className="rounded-panel border border-line-strong px-3 py-1.5 text-sm hover:border-accent hover:text-accent"
                               >
@@ -307,6 +322,7 @@ export function Builder({
         build={build}
         selectedSlugs={selectedSlugs}
         onPick={(category, slug) => {
+          if (!isMultiCategory(category)) focusAfterPick.current = category;
           setSelection((s) => selectPart(s, category, slug));
           setPicking(null);
         }}
