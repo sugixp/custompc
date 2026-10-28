@@ -19,6 +19,9 @@ Phase 1 (MVP), stages 1–9 of 10 are done and on `main`, CI green:
 | 8     | Builder at `/montar`: URL state, live checks, totals, shareable link |
 | 9     | E2E on its own database: keyboard, axe, offer age, errors, paging    |
 
+Deployed at https://custompc-six.vercel.app (Vercel + Neon, São Paulo),
+with example prices refreshed daily.
+
 CI runs three jobs on every push: lint/format/typecheck/unit tests/build
 (no database), migrate + seed + sync + idempotency on a fresh Postgres, and
 Playwright E2E (desktop and Pixel 7) against a production build over its
@@ -77,13 +80,16 @@ unreachable.
 - **Picker focus:** it opens on the search box, and after the first pick
   of a single-part slot focus goes to that slot's "Trocar" (the opener is
   gone). Found by the keyboard E2E.
-- **Deploy flow:** production deploys run migrations only; seeding is a
-  manual command or workflow, prices sync daily from GitHub Actions.
-  Previews skip migrations and only read the production database (see
-  docs/architecture.md, "Deployment", for the trade-off and the Neon
-  preview-branch alternative). The first Vercel build failed with P2028:
-  172 single-row upserts to Neon ran past the 5 s transaction timeout,
-  hence batched upserts.
+- **Deploy flow:** Vercel (`gru1`) + Neon (`sa-east-1`), both São Paulo.
+  Deploys only run migrations, never seed; seeding is a manual command or
+  workflow, prices sync daily from GitHub Actions with the direct URL in
+  the `PRODUCTION_DATABASE_URL` secret (workflows run only on schedule or
+  by hand, never on pull requests). Each preview gets its own Neon branch
+  `preview/<git-branch>` from the Vercel integration and migrates it; a
+  host check in `vercel-build` keeps previews off the production branch.
+  The first Vercel build failed with P2028: 172 single-row upserts to Neon
+  ran past the 5 s transaction timeout, hence batched upserts. Details in
+  docs/architecture.md, "Deployment".
 - **Visual direction** (chosen by the owner): dark "night panel" with
   datasheet typography: IBM Plex Sans/Mono, tabular figures, one lime
   accent `#b6f23a`, spec rows with dotted leaders. All text colors clear
@@ -98,9 +104,6 @@ unreachable.
    checked by hand (or a PDF) before `supportedCpus` can be filled.
 3. **Check the store search links by hand** in a browser. Only KaBuM!
    answered `curl`; Amazon, Mercado Livre, Pichau and Terabyte block bots.
-4. **Deploy**: Vercel project and Neon database exist. Pending: same
-   region on both, a green production deploy, the
-   `PRODUCTION_DATABASE_URL` secret, and one run of "Seed production".
-5. **Phase 2**: sign-up/login (Auth.js: email + hashed password, Google,
+4. **Phase 2**: sign-up/login (Auth.js: email + hashed password, Google,
    GitHub), saved builds and favorite parts, privacy policy page (LGPD,
    minimal user data).

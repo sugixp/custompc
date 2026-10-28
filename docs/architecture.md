@@ -252,26 +252,38 @@ the seed is idempotent.
 
 ## Deployment
 
-Vercel runs the app; Neon hosts Postgres. Both should sit in the same
-region: functions are pinned to `gru1` (São Paulo) in `vercel.json`, and
-the Neon project should be in AWS `sa-east-1` (a Neon project's region is
-fixed when it is created).
+Vercel runs the app; Neon hosts Postgres, both in São Paulo: functions are
+pinned to `gru1` in `vercel.json` and the Neon project lives in AWS
+`sa-east-1` (a Neon project's region is fixed when it is created). The
+database is connected through Vercel's Neon integration to Production and
+Preview, with "Create database branch for deployment" on for Preview.
+Development has no database variables; local work uses Docker.
 
-| What            | When                                             | Command / workflow                                  | Database URL                              |
-| --------------- | ------------------------------------------------ | --------------------------------------------------- | ----------------------------------------- |
-| Migrations      | every **production** deploy                      | `vercel-build` → `prisma migrate deploy`            | `DATABASE_URL_UNPOOLED` (direct)          |
-| App queries     | every request                                    | pg driver adapter                                   | `DATABASE_URL` (pooler)                   |
-| Example catalog | by hand, after the first deploy or a seed change | `npm run db:seed:prod` / "Seed production" workflow | `PRODUCTION_DATABASE_URL` (GitHub secret) |
-| Example prices  | daily                                            | "Price sync" workflow → `prices:sync`               | `PRODUCTION_DATABASE_URL` (GitHub secret) |
+| What            | When                                             | Command / workflow                                  | Database URL                                 |
+| --------------- | ------------------------------------------------ | --------------------------------------------------- | -------------------------------------------- |
+| Migrations      | every production and preview deploy              | `vercel-build` → `prisma migrate deploy`            | `DATABASE_URL_UNPOOLED` (direct, own branch) |
+| App queries     | every request                                    | pg driver adapter                                   | `DATABASE_URL` (pooler)                      |
+| Example catalog | by hand, after the first deploy or a seed change | `npm run db:seed:prod` / "Seed production" workflow | `PRODUCTION_DATABASE_URL` (GitHub secret)    |
+| Example prices  | daily                                            | "Price sync" workflow → `prices:sync`               | `PRODUCTION_DATABASE_URL` (GitHub secret)    |
 
 - **Deploys never seed.** Writing data is not part of a build: a failed or
   repeated build cannot change the catalog, and builds stay fast.
-- **Preview deploys skip migrations** (`VERCEL_ENV` is not `production`).
-  They read the same database as production and never write to it, since
-  pages only read. The trade-off: a preview whose branch adds a migration
-  runs against the old schema until it is merged. If that starts to matter,
-  Neon's Vercel integration can give each preview its own database branch;
-  then migrating previews becomes safe.
+- **Each preview has its own database branch.** On every preview deploy
+  the integration creates (or reuses) the Neon branch
+  `preview/<git-branch>`, a copy of production, and injects its URLs for
+  that deployment only; they never show up in `vercel env ls`. So a
+  preview applies its own migrations and sees production's data without
+  touching it. The branch goes away when its deployments are deleted
+  (Vercel keeps previews for 6 months by default), or by hand with
+  `neonctl branches delete`.
+- **Previews never migrate production.** `scripts/vercel-build.ts` compares
+  the database host with `PRODUCTION_DATABASE_HOST` (a Preview-only
+  variable holding just the production host) and skips migrations when
+  they match or the variable is missing, e.g. if a preview ever got the
+  production URL because the branch could not be created.
+- **Variables are Sensitive.** The integration's variables are not
+  readable from the dashboard or CLI; the production URL for scripts comes
+  from `neonctl connection-string`.
 - **TLS.** Neon's URLs carry `sslmode=require`. The pg driver verifies the
   certificate for that mode anyway, and `src/server/connection-string.ts`
   rewrites it to `verify-full` to say so (and silence pg's warning).
