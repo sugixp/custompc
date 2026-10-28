@@ -1,7 +1,7 @@
 name: Price sync
 
-# Offers go stale after 7 days. The deploy seeds fresh example offers, and
-# this keeps the demo's prices current between deploys. It runs the same
+# Offers go stale after 7 days, and deploys do not touch offers, so this
+# keeps the demo's example prices current. It runs the same
 # `npm run prices:sync` as a developer would, against the production
 # database in the PRODUCTION_DATABASE_URL secret; without it, it does nothing.
 on:
@@ -11,6 +11,11 @@ on:
 
 permissions:
   contents: read
+
+# Never at the same time as the production seed.
+concurrency:
+  group: production-database
+  cancel-in-progress: false
 
 jobs:
   sync:

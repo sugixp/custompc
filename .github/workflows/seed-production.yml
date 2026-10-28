@@ -1,0 +1,33 @@
+name: Seed production
+
+# Loads the example catalog into the production database. Started by hand
+# (Actions -> Seed production -> Run workflow), e.g. after the first deploy
+# or a seed data change. Deploys only apply migrations.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: production-database
+  cancel-in-progress: false
+
+jobs:
+  seed:
+    name: Seed the production database
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      PRODUCTION_DATABASE_URL: ${{ secrets.PRODUCTION_DATABASE_URL }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - run: npm ci
+
+      - run: npm run db:seed:prod
