@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "vercel-build": "prisma migrate deploy && prisma db seed && next build",
+    "vercel-build": "tsx scripts/vercel-build.ts",
     "start": "next start",
     "lint": "eslint",
     "format": "prettier --write .",
@@ -19,6 +19,7 @@
     "db:migrate": "prisma migrate dev",
     "db:deploy": "prisma migrate deploy",
     "db:seed": "prisma db seed",
+    "db:seed:prod": "tsx scripts/seed-production.ts",
     "db:reset": "prisma migrate reset --force && prisma db seed",
     "db:studio": "prisma studio",
     "prices:sync": "tsx scripts/sync-prices.ts",
