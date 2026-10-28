@@ -9,8 +9,9 @@ services:
       POSTGRES_PASSWORD: custompc
       POSTGRES_DB: custompc
     ports:
-      # 5433 on the host so it never clashes with a natively installed Postgres.
-      - "5433:5432"
+      # Host port from POSTGRES_PORT in .env (Compose reads it); change it when
+      # 5432 is taken, e.g. by a natively installed Postgres.
+      - "${POSTGRES_PORT:-5432}:5432"
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U custompc -d custompc"]
       interval: 5s

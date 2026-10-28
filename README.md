@@ -36,8 +36,10 @@ npm run dev
 
 Abra http://localhost:3000.
 
-O Postgres do Docker fica na porta **5433** do host, para não conflitar com
-um Postgres instalado direto na máquina. Para recomeçar do zero:
+O Postgres do Docker usa a porta **5432** do host. Se ela já estiver ocupada
+(por exemplo, por um Postgres instalado na máquina), defina `POSTGRES_PORT`
+no `.env` (ex.: `5433`) e use a mesma porta no `DATABASE_URL`. Para recomeçar
+do zero:
 `npm run db:reset`. Para parar o banco: `npm run db:down` (os dados ficam no
 volume `custompc-db`).
 
@@ -103,9 +105,10 @@ npm run db:seed            # loads the example parts (safe to re-run)
 npm run dev
 ```
 
-Open http://localhost:3000. Docker's Postgres listens on host port **5433**
-so it never clashes with a natively installed Postgres. `npm run db:reset`
-starts over; see the scripts table above.
+Open http://localhost:3000. Docker's Postgres listens on host port **5432**;
+if it is taken (e.g. by a natively installed Postgres), set `POSTGRES_PORT`
+in `.env` (e.g. `5433`) and use the same port in `DATABASE_URL`.
+`npm run db:reset` starts over; see the scripts table above.
 
 > Seed prices are **illustrative**. Part specs are real, and each part keeps
 > the manufacturer page they came from
