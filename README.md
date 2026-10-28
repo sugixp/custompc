@@ -11,10 +11,11 @@ Monte seu PC com **preços em reais**, links para **lojas brasileiras** e
 
 ## Telas
 
-| Desktop                                                                                          | Celular                                                          |
-| ------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------- |
-| ![Catálogo de processadores com filtros e preços em reais](docs/screenshots/listing-desktop.png) | ![Catálogo no celular](docs/screenshots/listing-mobile.png)      |
-| ![Página da peça com ofertas por loja e ficha técnica](docs/screenshots/detail-desktop.png)      | ![Página da peça no celular](docs/screenshots/detail-mobile.png) |
+| Desktop                                                                                                  | Celular                                                                       |
+| -------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| ![Montador com uma build, compatibilidade, preço total e por loja](docs/screenshots/builder-desktop.png) | ![Montador no celular com o resumo fixo](docs/screenshots/builder-mobile.png) |
+| ![Catálogo de processadores com filtros e preços em reais](docs/screenshots/listing-desktop.png)         | ![Catálogo no celular](docs/screenshots/listing-mobile.png)                   |
+| ![Página da peça com ofertas por loja e ficha técnica](docs/screenshots/detail-desktop.png)              | ![Página da peça no celular](docs/screenshots/detail-mobile.png)              |
 
 ![Página inicial com um exemplo real de verificação de compatibilidade](docs/screenshots/home-desktop.png)
 
@@ -74,6 +75,15 @@ volume `custompc-db`).
 | `npm run db:reset`    | Recria o banco e roda o seed                           |
 | `npm run prices:sync` | Atualiza as ofertas a partir dos provedores de preço   |
 
+## Status
+
+- ✅ Catálogo com filtros na URL, página de cada peça com ofertas e ficha técnica.
+- ✅ Montador em `/montar`: compatibilidade ao vivo, total em R$, total por
+  loja, consumo e fonte recomendada, link compartilhável.
+- ✅ 20 regras de compatibilidade com testes; 43 peças reais com specs dos
+  fabricantes; preços de exemplo.
+- ⏳ Próximo: E2E completos no CI, README final, deploy (Vercel + Neon).
+
 ## Arquitetura
 
 - **Domínio puro** (`src/domain`): schemas das peças, regras de
@@ -83,6 +93,9 @@ volume `custompc-db`).
   este repositório público e um pacote privado com os coletores reais e os IDs
   de afiliado. Os provedores rodam só no `npm run prices:sync`, nunca durante a
   requisição do usuário; as páginas leem as ofertas do banco.
+- **Montador** (`src/builder` + `/montar`): a build inteira fica na URL
+  (`?cpu=…&ram=…*2`); o servidor renderiza o link já montado e, no navegador,
+  cada mudança roda o mesmo `checkBuild` do domínio.
 - Ofertas com mais de 7 dias aparecem como desatualizadas; com mais de 30, somem.
 
 Detalhes, diagrama e como escrever um provedor privado:
@@ -114,9 +127,16 @@ stores** and **compatibility checks** between parts.
 
 ### Screenshots
 
-See the table above: the catalog with filters and prices in reais, a part
-page with store offers and its spec sheet, and the home page with a real
+See the table above: the builder with live compatibility checks, total and
+per-store prices; the catalog with filters and prices in reais; a part page
+with store offers and its spec sheet; and the home page with a real
 compatibility check on seed parts.
+
+### Status
+
+Catalog, part pages and the builder at `/montar` work end to end on example
+prices: live compatibility, total and per-store totals, power estimate and a
+shareable link. Next: full E2E in CI, final README and deploy.
 
 ### Why Brazil
 

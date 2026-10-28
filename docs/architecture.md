@@ -11,6 +11,8 @@ src/pricing/   the PriceProvider contract, the provider registry and the
                port (enforced by ESLint).
 src/seed/      the example catalog: real parts, stores, illustrative offers,
                demo scenarios.
+src/builder/   pure builder logic: URL encode/decode, slug resolution,
+               pricing, candidate checks.
 src/catalog/   pure presentation logic for the catalog: category routes, pt-BR
                spec formatting, facets, sorting, pagination, offer summaries.
 src/server/    server-side adapters: the Prisma client and the Prisma-backed
@@ -174,6 +176,45 @@ Because pages stream, a `notFound()` raised while rendering arrives after the
 200 status. Unknown categories are a fixed list, so `src/proxy.ts` rejects
 them up front with a real 404. Unknown part slugs need the database and
 render the not-found page with status 200 and `noindex`.
+
+Making the part page return a real 404 was tried: look the part up at the top
+of the page (no `loading.tsx`) with only the offers behind `<Suspense>`, and
+`export const instant = false` to allow the blocking route. It builds, but the
+layout's static shell (header and footer) is still sent first, which fixes
+the status at 200. Cache Components has no per-route switch to turn that off
+(`dynamic` and `dynamicParams` were removed), and a slug check in the proxy
+would query the database on every request, so the streamed, noindexed
+not-found stays.
+
+## Builder
+
+`/montar` keeps the whole build in the URL, so a link opens it assembled:
+
+```
+/montar?cpu=amd-ryzen-5-7600&placa=asus-tuf-gaming-b650m-plus-wifi
+       &ram=kingston-fury-beast-ddr5-6000-cl30-2x16gb*2&disco=kingston-nv3-1tb
+```
+
+One parameter per category (`cpu`, `placa`, `ram`, `gpu`, `disco`, `fonte`,
+`gabinete`, `cooler`); `ram` and `disco` can repeat and take a quantity after
+`*`, a character slugs never contain (unlike `x`, as in `2x16gb`). Writing
+follows a fixed order, so a build always has one link. `src/builder/url.ts`
+encodes and decodes it; malformed values, bad quantities and repeated
+single-part parameters are dropped and reported, and `resolve.ts` drops
+slugs missing from the catalog. The page shows a short notice and rewrites
+the address without them.
+
+The server renders the builder from the URL (title and Open Graph summarize
+CPU + GPU, part count, total and errors). In the browser, every change runs
+the same `checkBuild` from `src/domain`, so there is one set of rules, and
+replaces the URL in place. The part picker uses `candidateBlockers`: the
+errors a candidate would cause involving its own category, which is both the
+"compatible only" filter and the reason shown next to incompatible parts.
+
+Prices: the total takes each part's cheapest fresh offer in stock
+(`src/builder/pricing.ts`); "all at one store" totals rank stores by how many
+parts they lack, then by price, since one order usually means one shipping
+fee.
 
 ## Data model
 
