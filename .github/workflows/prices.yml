@@ -1,0 +1,41 @@
+name: Price sync
+
+# Offers go stale after 7 days. The deploy seeds fresh example offers, and
+# this keeps the demo's prices current between deploys. It runs the same
+# `npm run prices:sync` as a developer would, against the production
+# database in the PRODUCTION_DATABASE_URL secret; without it, it does nothing.
+on:
+  schedule:
+    - cron: "17 9 * * *" # daily, 06:17 in Brasília
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  sync:
+    name: Sync prices
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      DATABASE_URL: ${{ secrets.PRODUCTION_DATABASE_URL }}
+    steps:
+      - name: Check for the database secret
+        if: env.DATABASE_URL == ''
+        run: echo "::notice::PRODUCTION_DATABASE_URL is not set; nothing to sync."
+
+      - uses: actions/checkout@v7
+        if: env.DATABASE_URL != ''
+
+      - uses: actions/setup-node@v7
+        if: env.DATABASE_URL != ''
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - if: env.DATABASE_URL != ''
+        run: npm ci
+
+      - name: Sync prices
+        if: env.DATABASE_URL != ''
+        run: npm run prices:sync
