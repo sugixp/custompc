@@ -86,6 +86,11 @@ jobs:
       - name: Seed
         run: npm run db:seed
 
+      # Default PRICE_PROVIDERS: only the public seed provider, no private
+      # package installed.
+      - name: Sync prices
+        run: npm run prices:sync
+
       # The seed upserts everything, so a second run must change nothing.
       - name: Seed again (idempotency)
         run: |
