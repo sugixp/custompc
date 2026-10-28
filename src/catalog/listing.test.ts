@@ -4,6 +4,8 @@ import type { Part } from "@/domain/parts";
 import { applyFacetFilters, FACETS, facetOptions } from "./facets";
 import {
   listingQuery,
+  PAGE_SIZE,
+  pageSizeFrom,
   paginate,
   parseListingParams,
   sortListing,
@@ -132,6 +134,19 @@ describe("paginate", () => {
       total: 0,
     });
   });
+});
+
+describe("pageSizeFrom", () => {
+  it("reads a page size", () => {
+    expect(pageSizeFrom("5")).toBe(5);
+  });
+
+  it.each([undefined, "", "0", "-3", "2.5", "abc", "101"])(
+    "falls back to the default for %j",
+    (value) => {
+      expect(pageSizeFrom(value)).toBe(PAGE_SIZE);
+    },
+  );
 });
 
 describe("facets", () => {

@@ -9,7 +9,12 @@ import {
   type CategoryRoute,
 } from "@/catalog/categories";
 import { applyFacetFilters, FACETS, facetOptions } from "@/catalog/facets";
-import { paginate, parseListingParams, sortListing } from "@/catalog/listing";
+import {
+  pageSizeFrom,
+  paginate,
+  parseListingParams,
+  sortListing,
+} from "@/catalog/listing";
 import { summarizeOffers } from "@/catalog/offers";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { FilterForm } from "@/components/filter-form";
@@ -84,7 +89,11 @@ async function Listing({
     return { part, price: summary.price, storeCount: summary.offers.length };
   });
   const filtered = applyFacetFilters(items, facets, params.filters);
-  const page = paginate(sortListing(filtered, params.sort), params.page);
+  const page = paginate(
+    sortListing(filtered, params.sort),
+    params.page,
+    pageSizeFrom(process.env.CATALOG_PAGE_SIZE),
+  );
   const basePath = `/pecas/${route.slug}`;
 
   return (

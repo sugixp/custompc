@@ -12,6 +12,18 @@ export type SortOrder = (typeof SORT_OPTIONS)[number]["value"];
 
 export const DEFAULT_SORT: SortOrder = "preco";
 export const PAGE_SIZE = 12;
+const MAX_PAGE_SIZE = 100;
+
+/**
+ * Parts per listing page, from CATALOG_PAGE_SIZE. Production leaves it unset;
+ * the E2E server uses a small size so the seed catalog spans several pages.
+ */
+export function pageSizeFrom(value: string | undefined): number {
+  const size = Number(value);
+  return Number.isSafeInteger(size) && size >= 1 && size <= MAX_PAGE_SIZE
+    ? size
+    : PAGE_SIZE;
+}
 
 export interface ListingParams {
   sort: SortOrder;
