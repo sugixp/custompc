@@ -8,8 +8,8 @@
 Monte seu PC com **preços em reais**, links para **lojas brasileiras** e
 **verificação de compatibilidade** entre as peças.
 
-**Demo:** https://custompc-six.vercel.app ·
-[montar um PC](https://custompc-six.vercel.app/montar)
+**Demo:** https://custompc-builder.vercel.app ·
+[montar um PC](https://custompc-builder.vercel.app/montar)
 
 ![Montando um PC: a placa AM4 aparece como incompatível com o Ryzen AM5, e a build termina sem problemas, com total em reais](docs/screenshots/builder.gif)
 
@@ -186,8 +186,8 @@ peça, uma limitação para marketplaces com vários vendedores.
 Build your PC with **prices in Brazilian reais (R$)**, links to **Brazilian
 stores** and **compatibility checks** between parts.
 
-**Demo:** https://custompc-six.vercel.app ·
-[build a PC](https://custompc-six.vercel.app/montar) (the UI is in
+**Demo:** https://custompc-builder.vercel.app ·
+[build a PC](https://custompc-builder.vercel.app/montar) (the UI is in
 Portuguese).
 
 ### Highlights

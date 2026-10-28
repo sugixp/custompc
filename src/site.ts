@@ -1,12 +1,14 @@
+/** The demo's address. custompc-six.vercel.app still serves the same app. */
+export const PRODUCTION_URL = "https://custompc-builder.vercel.app";
+
 /**
- * Public URL of the site, for absolute links in metadata (Open Graph).
- * On Vercel it defaults to the production domain, which Vercel provides.
+ * Public URL of the site, for canonical links and Open Graph (metadataBase).
+ * Every Vercel deploy uses the demo's address; Vercel's own
+ * VERCEL_PROJECT_PRODUCTION_URL would pick the older, shorter domain.
  */
 export const SITE_URL = new URL(
   process.env.NEXT_PUBLIC_SITE_URL ??
-    (process.env.VERCEL_PROJECT_PRODUCTION_URL
-      ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
-      : "http://localhost:3000"),
+    (process.env.VERCEL ? PRODUCTION_URL : "http://localhost:3000"),
 );
 
 export const SITE_NAME = "custompc";

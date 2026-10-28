@@ -21,7 +21,7 @@ Phase 1 (MVP) is done: all 10 stages are on `main`, CI green:
 | 9     | E2E on its own database: keyboard, axe, offer age, errors, paging    |
 | 10    | Deploy (Vercel + Neon), final README (PT/EN) with the builder GIF    |
 
-Deployed at https://custompc-six.vercel.app (Vercel + Neon, São Paulo),
+Deployed at https://custompc-builder.vercel.app (Vercel + Neon, São Paulo),
 with example prices refreshed daily.
 
 CI runs three jobs on every push: lint/format/typecheck/unit tests/build
