@@ -49,6 +49,8 @@ export const cpuSpecsSchema = z
     baseClockMhz: positiveInt,
     boostClockMhz: positiveInt,
     tdpW: positiveInt,
+    /** Sustained peak draw: Intel PL2 or AMD PPT. Falls back to tdpW. */
+    maxPowerW: positiveInt.optional(),
     integratedGraphics: z.boolean(),
     memoryTypes: z.array(memoryTypeSchema).min(1),
   })
@@ -59,6 +61,10 @@ export const cpuSpecsSchema = z
   .refine((cpu) => cpu.boostClockMhz >= cpu.baseClockMhz, {
     message: "boostClockMhz must be >= baseClockMhz",
     path: ["boostClockMhz"],
+  })
+  .refine((cpu) => cpu.maxPowerW === undefined || cpu.maxPowerW >= cpu.tdpW, {
+    message: "maxPowerW must be >= tdpW",
+    path: ["maxPowerW"],
   });
 
 /**

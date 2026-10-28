@@ -25,6 +25,7 @@ export const cpu: Cpu = {
     baseClockMhz: 3800,
     boostClockMhz: 5100,
     tdpW: 65,
+    maxPowerW: 88,
     integratedGraphics: true,
     memoryTypes: ["DDR5"],
   },

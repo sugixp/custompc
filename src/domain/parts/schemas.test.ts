@@ -86,6 +86,19 @@ describe("CPU", () => {
     expect(issuePaths(result)).toContain("specs.boostClockMhz");
   });
 
+  it("treats maxPowerW as optional but never below tdpW", () => {
+    const withoutMax: Partial<typeof fx.cpu.specs> = { ...fx.cpu.specs };
+    delete withoutMax.maxPowerW;
+    expect(cpuSchema.safeParse({ ...fx.cpu, specs: withoutMax }).success).toBe(
+      true,
+    );
+    const result = cpuSchema.safeParse({
+      ...fx.cpu,
+      specs: { ...fx.cpu.specs, maxPowerW: 50 },
+    });
+    expect(issuePaths(result)).toContain("specs.maxPowerW");
+  });
+
   it("rejects unknown sockets", () => {
     const result = cpuSchema.safeParse({
       ...fx.cpu,
