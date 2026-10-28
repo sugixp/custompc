@@ -70,5 +70,24 @@ seeds. Production data comes from `npm run db:seed:prod` (reads
 the daily "Price sync" workflow. Both workflows use the
 `PRODUCTION_DATABASE_URL` repository secret.
 
+## Deploy and infrastructure
+
+The agent runs the deploy through the Vercel CLI (`vercel`) and the Neon
+CLI (`neonctl`, project `floral-field-87906490`, org
+`org-misty-moon-54808836`) or the Neon MCP server when it fits better.
+
+- **Without asking:** read logs and status, preview deploys, create or
+  change Preview and Development environment variables, create Neon
+  branches for previews.
+- **Ask first:** manual production deploys, changing Production variables
+  (including the `PRODUCTION_DATABASE_URL` secret), running seed or sync
+  against production, creating, recreating or deleting Neon projects or
+  databases, changing regions, anything that costs money or leaves the
+  free plan.
+- **Never:** write tokens, passwords or connection strings into repo
+  files, committed logs or commit messages. Pass them from
+  `neonctl connection-string` straight to `vercel env add` or
+  `gh secret set`.
+
 Next.js 16 with Cache Components: read `node_modules/next/dist/docs/`
 before using an API you are unsure of.
