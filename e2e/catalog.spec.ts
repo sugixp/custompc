@@ -106,6 +106,7 @@ test("no page scrolls sideways", async ({ page }) => {
     "/pecas",
     "/pecas/processadores",
     "/pecas/placas-de-video/asus-prime-rtx-5070-12g",
+    "/montar?cpu=amd-ryzen-5-7600&placa=asus-prime-b550m-a&ram=kingston-fury-beast-ddr4-3200-cl16-2x16gb*2&gpu=asus-tuf-rtx-5080-16g-gaming&disco=wd-blue-2tb-wd20ezbx&fonte=asus-tuf-gaming-750w-gold&gabinete=fractal-meshify-2-compact",
   ]) {
     await page.goto(path);
     await expect(page.getByRole("heading", { level: 1 })).toBeVisible();

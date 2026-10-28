@@ -11,6 +11,14 @@ const pages = [
   { name: "home", path: "/" },
   { name: "listing", path: "/pecas/processadores" },
   { name: "detail", path: "/pecas/placas-de-video/asus-prime-rtx-5070-12g" },
+  {
+    name: "builder",
+    path:
+      "/montar?cpu=amd-ryzen-5-7600&placa=asus-tuf-gaming-b650m-plus-wifi" +
+      "&ram=kingston-fury-beast-ddr5-6000-cl30-2x16gb&gpu=asus-tuf-rtx-5080-16g-gaming" +
+      "&disco=kingston-nv3-1tb&fonte=asus-tuf-gaming-750w-gold" +
+      "&gabinete=fractal-meshify-2-compact&cooler=deepcool-ak400",
+  },
 ];
 
 const viewports = [
@@ -37,7 +45,10 @@ async function main() {
           () => !document.querySelector('[role="status"]'),
         );
         const file = `${outDir}/${name}-${viewport}.png`;
-        await page.screenshot({ path: file, fullPage: viewport === "mobile" });
+        // Full-page shots on phones, except the builder, whose fixed summary
+        // bar would land mid-image; its viewport shot shows the bar in place.
+        const fullPage = viewport === "mobile" && name !== "builder";
+        await page.screenshot({ path: file, fullPage });
         console.log(`saved ${file}`);
       }
       await context.close();
