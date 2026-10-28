@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ChipMark } from "@/components/chip-mark";
 
 export function SiteHeader() {
   return (
@@ -8,12 +9,7 @@ export function SiteHeader() {
           href="/"
           className="flex items-center gap-2 font-mono text-sm font-medium tracking-tight"
         >
-          <span
-            aria-hidden="true"
-            className="grid size-6 place-items-center rounded-[4px] bg-accent text-[11px] font-semibold text-accent-ink"
-          >
-            cp
-          </span>
+          <ChipMark className="size-6" />
           custompc
         </Link>
         <nav aria-label="Principal">
