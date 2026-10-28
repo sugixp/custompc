@@ -131,10 +131,12 @@ jobs:
 
       - run: npm ci
 
+      # The aged offers give e2e/offers.spec.ts stale and expired prices.
       - name: Prepare the database
         run: |
           npm run db:deploy
           npm run db:seed
+          PRICE_PROVIDERS=./e2e/fixtures/aged-offers.ts npm run prices:sync
 
       - name: Build
         run: npm run build
