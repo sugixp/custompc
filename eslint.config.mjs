@@ -32,6 +32,25 @@ const eslintConfig = defineConfig([
       ],
     },
   },
+  // src/pricing defines the provider contract and the sync; storage is
+  // reached through the OfferRepository port, implemented in src/server.
+  {
+    files: ["src/pricing/**/*.ts"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            {
+              group: ["@prisma/*", "@/generated/*", "@/server/*", "@/app/*"],
+              message:
+                "src/pricing talks to storage through OfferRepository only.",
+            },
+          ],
+        },
+      ],
+    },
+  },
   // Formatting is Prettier's job; turn off the rules that would fight it.
   prettier,
   globalIgnores([

@@ -1,16 +1,16 @@
-// Loads the example catalog. Idempotent: every row is upserted by a natural
-// key (store slug, part slug, part+store), so it can run any number of times.
+// Loads the example catalog: stores and parts, then offers from the seed price
+// provider through the same sync that `npm run prices:sync` runs. Idempotent:
+// every row is upserted by a natural key (store slug, part slug, part+store).
 // Run with `npm run db:seed`.
 import "dotenv/config";
-import { PrismaPg } from "@prisma/adapter-pg";
-import { PrismaClient } from "@/generated/prisma/client";
-import { offers, parseSeedPart, parts, stores } from "./seed-data";
+import { seedPriceProvider } from "@/pricing/providers/seed-provider";
+import { formatSyncReport } from "@/pricing/report";
+import { syncPrices } from "@/pricing/sync";
+import { parseSeedPart, parts, stores } from "@/seed";
+import { prismaOfferRepository } from "@/server/offer-repository";
+import { createPrismaClient } from "@/server/prisma";
 
-const connectionString = process.env.DATABASE_URL;
-if (!connectionString) throw new Error("DATABASE_URL is not set");
-const prisma = new PrismaClient({
-  adapter: new PrismaPg({ connectionString }),
-});
+const prisma = createPrismaClient();
 
 async function main() {
   // Validate everything before touching the database.
@@ -19,17 +19,14 @@ async function main() {
     specSourceUrls: [...seedPart.specSourceUrls],
   }));
 
-  const storeIds = new Map<string, string>();
   for (const { slug, name, siteUrl } of stores) {
-    const row = await prisma.store.upsert({
+    await prisma.store.upsert({
       where: { slug },
       create: { slug, name, siteUrl },
       update: { name, siteUrl },
     });
-    storeIds.set(slug, row.id);
   }
 
-  const partIds = new Map<string, string>();
   for (const { part, specSourceUrls } of validated) {
     const data = {
       category: part.category,
@@ -38,38 +35,24 @@ async function main() {
       specs: part.specs,
       specSourceUrls,
     };
-    const row = await prisma.part.upsert({
+    await prisma.part.upsert({
       where: { slug: part.slug },
       create: { slug: part.slug, ...data },
       update: data,
     });
-    partIds.set(part.slug, row.id);
   }
+  console.log(`Seeded ${stores.length} stores and ${validated.length} parts.`);
 
-  for (const offer of offers) {
-    const partId = partIds.get(offer.partSlug);
-    const storeId = storeIds.get(offer.storeSlug);
-    if (!partId || !storeId)
-      throw new Error(
-        `Unknown part or store in offer ${offer.partSlug}@${offer.storeSlug}`,
-      );
-    const data = {
-      priceCents: offer.priceCents,
-      url: offer.url,
-      inStock: offer.inStock,
-      seenAt: offer.seenAt,
-      source: offer.source,
-    };
-    await prisma.offer.upsert({
-      where: { partId_storeId: { partId, storeId } },
-      create: { partId, storeId, ...data },
-      update: data,
-    });
+  const report = await syncPrices({
+    providers: [seedPriceProvider],
+    repository: prismaOfferRepository(prisma),
+  });
+  console.log(formatSyncReport([seedPriceProvider.id], report));
+  if (report.rejected.length > 0 || report.failedProviders.length > 0) {
+    throw new Error(
+      "The seed price provider produced offers the sync rejected",
+    );
   }
-
-  console.log(
-    `Seeded ${stores.length} stores, ${validated.length} parts, ${offers.length} offers.`,
-  );
 }
 
 main()

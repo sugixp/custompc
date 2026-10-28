@@ -2,7 +2,13 @@ import { describe, expect, it } from "vitest";
 import type { Build } from "@/domain/build/build";
 import { checkBuild } from "@/domain/compatibility";
 import { CATEGORIES, type Part, type PartOf } from "@/domain/parts";
-import { offers, parseSeedPart, parts, scenarios, stores } from ".";
+import {
+  exampleOffers as offers,
+  parseSeedPart,
+  parts,
+  scenarios,
+  stores,
+} from ".";
 
 // Validates the seed files without a database.
 

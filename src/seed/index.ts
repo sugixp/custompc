@@ -25,7 +25,7 @@ export const parts: SeedPart[] = [
   ...coolers,
 ];
 
-export const offers = buildOffers(parts);
+export const exampleOffers = buildOffers(parts);
 
 /**
  * Validates a seed part with the domain schema. The slug stands in for the id,
