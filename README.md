@@ -49,18 +49,34 @@ volume `custompc-db`).
 
 ## Scripts
 
-| Comando              | O que faz                            |
-| -------------------- | ------------------------------------ |
-| `npm run dev`        | Servidor de desenvolvimento          |
-| `npm run lint`       | ESLint                               |
-| `npm run typecheck`  | Checagem de tipos do TypeScript      |
-| `npm test`           | Testes unitários (Vitest)            |
-| `npm run format`     | Formata o código com Prettier        |
-| `npm run db:up`      | Sobe o Postgres (Docker)             |
-| `npm run db:deploy`  | Aplica as migrations                 |
-| `npm run db:migrate` | Cria uma migration (desenvolvimento) |
-| `npm run db:seed`    | Carrega os dados de exemplo          |
-| `npm run db:reset`   | Recria o banco e roda o seed         |
+| Comando               | O que faz                                            |
+| --------------------- | ---------------------------------------------------- |
+| `npm run dev`         | Servidor de desenvolvimento                          |
+| `npm run lint`        | ESLint                                               |
+| `npm run typecheck`   | Checagem de tipos do TypeScript                      |
+| `npm test`            | Testes unitários (Vitest)                            |
+| `npm run format`      | Formata o código com Prettier                        |
+| `npm run db:up`       | Sobe o Postgres (Docker)                             |
+| `npm run db:deploy`   | Aplica as migrations                                 |
+| `npm run db:migrate`  | Cria uma migration (desenvolvimento)                 |
+| `npm run db:seed`     | Carrega os dados de exemplo                          |
+| `npm run db:reset`    | Recria o banco e roda o seed                         |
+| `npm run prices:sync` | Atualiza as ofertas a partir dos provedores de preço |
+
+## Arquitetura
+
+- **Domínio puro** (`src/domain`): schemas das peças, regras de
+  compatibilidade, dinheiro em centavos e validade das ofertas, sem Next.js nem
+  banco.
+- **Preços** (`src/pricing`): a interface `PriceProvider` é a fronteira entre
+  este repositório público e um pacote privado com os coletores reais e os IDs
+  de afiliado. Os provedores rodam só no `npm run prices:sync`, nunca durante a
+  requisição do usuário; as páginas leem as ofertas do banco.
+- Ofertas com mais de 7 dias aparecem como desatualizadas; com mais de 30, somem.
+
+Detalhes, diagrama e como escrever um provedor privado:
+[docs/architecture.md](docs/architecture.md). Regras de compatibilidade:
+[docs/compatibility.md](docs/compatibility.md).
 
 ## Roadmap
 
@@ -113,6 +129,15 @@ in `.env` (e.g. `5433`) and use the same port in `DATABASE_URL`.
 > Seed prices are **illustrative**. Part specs are real, and each part keeps
 > the manufacturer page they came from
 > ([docs/architecture.md](docs/architecture.md#seed-data)).
+
+### Architecture
+
+A pure domain layer (`src/domain`) holds part schemas, compatibility rules,
+money and offer freshness. `src/pricing` defines the `PriceProvider`
+interface, the boundary between this public repo and a private package with
+real price collectors and affiliate ids. Providers only run in
+`npm run prices:sync`, never during a request; pages read offers from the
+database. See [docs/architecture.md](docs/architecture.md).
 
 ### License
 
