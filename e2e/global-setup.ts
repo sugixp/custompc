@@ -35,7 +35,13 @@ export default async function globalSetup() {
   const run = (command: string, env: Record<string, string> = {}) =>
     execSync(command, {
       stdio: ["ignore", "ignore", "inherit"],
-      env: { ...process.env, DATABASE_URL: url.href, ...env },
+      env: {
+        ...process.env,
+        DATABASE_URL: url.href,
+        // prisma.config.ts prefers it, so it must point at the test database too.
+        DATABASE_URL_UNPOOLED: url.href,
+        ...env,
+      },
     });
   run("npx prisma migrate deploy");
   run("npx prisma db seed");

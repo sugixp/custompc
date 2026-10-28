@@ -12,8 +12,10 @@ export default defineConfig({
   },
   // Read directly instead of with env(), which throws when the variable is
   // unset: `prisma generate` runs on npm install and needs no database.
-  // Commands that do need one still fail with a clear message.
+  // Commands that do need one still fail with a clear message. Migrations
+  // need a direct connection, not a pooler; Neon's integration provides it
+  // as DATABASE_URL_UNPOOLED.
   datasource: {
-    url: process.env.DATABASE_URL,
+    url: process.env.DATABASE_URL_UNPOOLED ?? process.env.DATABASE_URL,
   },
 });
