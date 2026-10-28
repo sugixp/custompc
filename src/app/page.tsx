@@ -1,12 +1,76 @@
+import Link from "next/link";
+import { CategoryGrid } from "@/components/category-grid";
+import { CompatibilityExample } from "@/components/compatibility-example";
+
+const STEPS = [
+  {
+    title: "Escolha as peças",
+    text: "Especificações tiradas dos sites dos fabricantes, com a fonte em cada peça.",
+  },
+  {
+    title: "Confira a compatibilidade",
+    text: "Soquete, memória, tamanho no gabinete e potência da fonte, com erros e avisos claros.",
+  },
+  {
+    title: "Compare lojas brasileiras",
+    text: "Preços em reais na Amazon, Mercado Livre, KaBuM!, Pichau e Terabyte.",
+  },
+];
+
 export default function Home() {
   return (
-    <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col justify-center gap-4 px-4 py-16">
-      <h1 className="text-4xl font-semibold tracking-tight">custompc</h1>
-      <p className="text-foreground/80 text-lg">
-        Monte seu PC com preços em reais, links para lojas brasileiras e
-        verificação de compatibilidade entre as peças.
-      </p>
-      <p className="text-foreground/60 text-sm">Em construção.</p>
-    </main>
+    <div className="mx-auto max-w-6xl px-4">
+      <section className="grid items-center gap-10 py-14 sm:py-20 lg:grid-cols-[1fr_26rem]">
+        <div>
+          <p className="spec-label text-accent">Montador de PC · Brasil</p>
+          <h1 className="mt-3 max-w-3xl text-4xl leading-tight font-semibold tracking-tight text-balance sm:text-5xl">
+            Monte seu PC com preço em real e peças que se encaixam.
+          </h1>
+          <p className="mt-5 max-w-2xl text-lg text-muted">
+            Compare ofertas de lojas brasileiras e veja na hora se o
+            processador, a placa-mãe, a memória, a fonte e o gabinete funcionam
+            juntos.
+          </p>
+          <div className="mt-8 flex flex-wrap gap-3">
+            <Link
+              href="/pecas"
+              className="rounded-panel bg-accent px-5 py-2.5 font-medium text-accent-ink hover:brightness-110"
+            >
+              Explorar peças
+            </Link>
+          </div>
+        </div>
+        <CompatibilityExample />
+      </section>
+
+      <section
+        aria-labelledby="como-funciona"
+        className="border-y border-line py-8"
+      >
+        <h2 id="como-funciona" className="sr-only">
+          Como funciona
+        </h2>
+        <ol className="grid gap-6 sm:grid-cols-3">
+          {STEPS.map((step, index) => (
+            <li key={step.title} className="flex gap-4">
+              <span className="tabular text-sm text-accent">0{index + 1}</span>
+              <div>
+                <h3 className="font-medium">{step.title}</h3>
+                <p className="mt-1 text-sm text-muted">{step.text}</p>
+              </div>
+            </li>
+          ))}
+        </ol>
+      </section>
+
+      <section aria-labelledby="categorias" className="py-12">
+        <h2 id="categorias" className="text-xl font-semibold">
+          Categorias
+        </h2>
+        <div className="mt-5">
+          <CategoryGrid headingLevel={3} />
+        </div>
+      </section>
+    </div>
   );
 }

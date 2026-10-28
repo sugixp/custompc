@@ -1,26 +1,86 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/*
+ * "Night panel" theme: layered graphite surfaces, one lime accent for prices
+ * and actions, datasheet typography (IBM Plex Sans + Plex Mono with tabular
+ * figures). Every text color clears WCAG AA (4.5:1) on every surface:
+ * against bg, text is 15.4:1, muted 7.4:1, accent 14.2:1; the lowest pair
+ * (muted on raised) is 6.4:1.
+ */
+@theme {
+  --color-bg: #0f1115;
+  --color-surface: #161920;
+  --color-raised: #1d2129;
+  --color-line: #2a2f3a;
+  --color-line-strong: #3a4150;
+  --color-text: #e6e8ec;
+  --color-muted: #9ba3b1;
+  --color-accent: #b6f23a;
+  --color-accent-ink: #11140a;
+  --color-ok: #69db7c;
+  --color-warn: #f2b84b;
+  --color-error: #ff8787;
+
+  --font-sans: var(--font-plex-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-plex-mono), ui-monospace, monospace;
+
+  --radius-panel: 6px;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
+@layer base {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    color-scheme: dark;
+  }
+
+  body {
+    background: var(--color-bg);
+    color: var(--color-text);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* One visible focus style everywhere keyboard users land. */
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+
+  ::selection {
+    background: var(--color-accent);
+    color: var(--color-accent-ink);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: var(--font-sans), system-ui, sans-serif;
+@layer components {
+  /* Datasheet label: small caps feel, spaced, mono. */
+  .spec-label {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-muted);
+  }
+
+  .tabular {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Dotted leader between a spec label and its value. */
+  .leader {
+    flex: 1;
+    min-width: 1rem;
+    border-bottom: 1px dotted var(--color-line-strong);
+    transform: translateY(-0.3em);
+  }
 }

@@ -6,6 +6,12 @@ import { createPrismaClient } from "./prisma";
 // new connection pool on every edit.
 const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient };
 
-export const db = globalForPrisma.prisma ?? createPrismaClient();
-
-if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = db;
+/**
+ * The shared Prisma client, created on first use. Importing this module never
+ * needs DATABASE_URL, so builds that prerender only static shells work
+ * without a database.
+ */
+export function getDb(): PrismaClient {
+  globalForPrisma.prisma ??= createPrismaClient();
+  return globalForPrisma.prisma;
+}
