@@ -1,5 +1,7 @@
 # custompc
 
+[![CI](https://github.com/sugixp/custompc/actions/workflows/ci.yml/badge.svg)](https://github.com/sugixp/custompc/actions/workflows/ci.yml)
+
 **Português** · [English](#english)
 
 Monte seu PC com **preços em reais**, links para **lojas brasileiras** e
