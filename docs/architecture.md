@@ -250,6 +250,38 @@ validates every part with Zod and checks the offers, all without a database.
 CI also migrates, seeds and syncs a fresh Postgres, then seeds again to prove
 the seed is idempotent.
 
+## Deployment
+
+Vercel runs the app; Neon hosts Postgres. Both should sit in the same
+region: functions are pinned to `gru1` (São Paulo) in `vercel.json`, and
+the Neon project should be in AWS `sa-east-1` (a Neon project's region is
+fixed when it is created).
+
+| What            | When                                             | Command / workflow                                  | Database URL                              |
+| --------------- | ------------------------------------------------ | --------------------------------------------------- | ----------------------------------------- |
+| Migrations      | every **production** deploy                      | `vercel-build` → `prisma migrate deploy`            | `DATABASE_URL_UNPOOLED` (direct)          |
+| App queries     | every request                                    | pg driver adapter                                   | `DATABASE_URL` (pooler)                   |
+| Example catalog | by hand, after the first deploy or a seed change | `npm run db:seed:prod` / "Seed production" workflow | `PRODUCTION_DATABASE_URL` (GitHub secret) |
+| Example prices  | daily                                            | "Price sync" workflow → `prices:sync`               | `PRODUCTION_DATABASE_URL` (GitHub secret) |
+
+- **Deploys never seed.** Writing data is not part of a build: a failed or
+  repeated build cannot change the catalog, and builds stay fast.
+- **Preview deploys skip migrations** (`VERCEL_ENV` is not `production`).
+  They read the same database as production and never write to it, since
+  pages only read. The trade-off: a preview whose branch adds a migration
+  runs against the old schema until it is merged. If that starts to matter,
+  Neon's Vercel integration can give each preview its own database branch;
+  then migrating previews becomes safe.
+- **TLS.** Neon's URLs carry `sslmode=require`. The pg driver verifies the
+  certificate for that mode anyway, and `src/server/connection-string.ts`
+  rewrites it to `verify-full` to say so (and silence pg's warning).
+  Migration URLs keep `require`: Prisma's schema engine does not know
+  `verify-full` and silently connects without TLS when given it.
+- **Writes are batched.** The sync upserts up to 500 offers per statement
+  (`INSERT … SELECT FROM unnest(…) ON CONFLICT DO UPDATE`) inside one
+  transaction, so a sync costs a few round trips even from far away. A row
+  per statement once ran past Prisma's 5 s transaction timeout on Neon.
+
 ## Known limitations
 
 - **One offer per part per store.** `Offer` has `@@unique([partId, storeId])`.

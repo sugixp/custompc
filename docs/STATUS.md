@@ -77,6 +77,13 @@ unreachable.
 - **Picker focus:** it opens on the search box, and after the first pick
   of a single-part slot focus goes to that slot's "Trocar" (the opener is
   gone). Found by the keyboard E2E.
+- **Deploy flow:** production deploys run migrations only; seeding is a
+  manual command or workflow, prices sync daily from GitHub Actions.
+  Previews skip migrations and only read the production database (see
+  docs/architecture.md, "Deployment", for the trade-off and the Neon
+  preview-branch alternative). The first Vercel build failed with P2028:
+  172 single-row upserts to Neon ran past the 5 s transaction timeout,
+  hence batched upserts.
 - **Visual direction** (chosen by the owner): dark "night panel" with
   datasheet typography: IBM Plex Sans/Mono, tabular figures, one lime
   accent `#b6f23a`, spec rows with dotted leaders. All text colors clear
@@ -91,8 +98,9 @@ unreachable.
    checked by hand (or a PDF) before `supportedCpus` can be filled.
 3. **Check the store search links by hand** in a browser. Only KaBuM!
    answered `curl`; Amazon, Mercado Livre, Pichau and Terabyte block bots.
-4. **Deploy**: Vercel + Neon. Needs the owner's accounts; set
-   `DATABASE_URL`, `NEXT_PUBLIC_SITE_URL`, run `db:deploy`, `db:seed`.
+4. **Deploy**: Vercel project and Neon database exist. Pending: same
+   region on both, a green production deploy, the
+   `PRODUCTION_DATABASE_URL` secret, and one run of "Seed production".
 5. **Phase 2**: sign-up/login (Auth.js: email + hashed password, Google,
    GitHub), saved builds and favorite parts, privacy policy page (LGPD,
    minimal user data).

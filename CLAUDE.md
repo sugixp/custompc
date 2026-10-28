@@ -63,5 +63,12 @@ npm run build && npm run start -- -p 3100   # in another terminal
 npm run screenshots                          # writes docs/screenshots
 ```
 
+Deploy (details in docs/architecture.md, "Deployment"): Vercel builds with
+`vercel-build`, which migrates only when `VERCEL_ENV=production` and never
+seeds. Production data comes from `npm run db:seed:prod` (reads
+`PRODUCTION_DATABASE_URL`) or the "Seed production" workflow; prices from
+the daily "Price sync" workflow. Both workflows use the
+`PRODUCTION_DATABASE_URL` repository secret.
+
 Next.js 16 with Cache Components: read `node_modules/next/dist/docs/`
 before using an API you are unsure of.
