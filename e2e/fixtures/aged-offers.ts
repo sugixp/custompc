@@ -4,11 +4,8 @@ import { exampleOffers } from "@/seed";
 /**
  * A test-only price provider that re-reports some seed offers as seen long
  * ago, so the E2E tests can check how stale and expired prices are shown.
- * Run it after the seed (a later `npm run db:seed` makes them fresh again):
- *
- *   PRICE_PROVIDERS=./e2e/fixtures/aged-offers.ts npm run prices:sync
- *
- * Only coolers are aged, since no other spec reads their prices.
+ * e2e/global-setup.ts runs it on the E2E database after the seed. Only
+ * coolers are aged, since no other spec reads their prices.
  */
 
 const DAY_MS = 24 * 60 * 60 * 1000;

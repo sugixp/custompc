@@ -1,6 +1,11 @@
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
+import { E2E_PAGE_SIZE } from "./servers";
 
 // Runs against the seed catalog: 6 CPUs, one of them (Ryzen 5 5600X) on AM4.
+// The E2E server shows E2E_PAGE_SIZE (5) parts per page, so CPUs take two.
+
+const resultCount = (page: Page) =>
+  page.getByRole("heading", { level: 2, name: /^\d+ peças?$/ });
 
 test.describe("category listing", () => {
   test("filters by socket and keeps the filter in a shareable URL", async ({
@@ -11,7 +16,7 @@ test.describe("category listing", () => {
       page.getByRole("heading", { level: 1, name: "Processadores" }),
     ).toBeVisible();
     const cards = page.getByRole("article");
-    await expect(cards).toHaveCount(6);
+    await expect(resultCount(page)).toHaveText("6 peças");
 
     await page.getByLabel("Soquete").selectOption("AM4");
     await page.getByRole("button", { name: "Aplicar" }).click();
@@ -35,20 +40,44 @@ test.describe("category listing", () => {
     await page
       .getByRole("link", { name: "veja todas as processadores" })
       .click();
-    await expect(page.getByRole("article")).toHaveCount(6);
+    await expect(resultCount(page)).toHaveText("6 peças");
   });
 
-  // No seed category fills a page (12 parts), so only the edges are tested
-  // here; the page math is unit-tested in src/catalog/listing.test.ts.
-  test("falls back to the only page for a bad page number", async ({
+  test("pages through the results and keeps the sort order", async ({
     page,
   }) => {
-    for (const pagina of ["5", "0", "abc"]) {
+    await page.goto("/pecas/processadores?ordem=nome");
+    const cards = page.getByRole("article");
+    const pager = page.getByRole("navigation", { name: "Paginação" });
+    await expect(cards).toHaveCount(E2E_PAGE_SIZE);
+    await expect(pager).toContainText("Página 1 de 2");
+    await expect(pager.getByRole("link", { name: /Anterior/ })).toHaveCount(0);
+    const firstPage = await cards.allTextContents();
+
+    await pager.getByRole("link", { name: /Próxima/ }).click();
+    await expect(page).toHaveURL(/\?ordem=nome&pagina=2$/);
+    await expect(pager).toContainText("Página 2 de 2");
+    await expect(cards).toHaveCount(6 - E2E_PAGE_SIZE);
+    await expect(pager.getByRole("link", { name: /Próxima/ })).toHaveCount(0);
+    expect(firstPage).not.toContain(await cards.first().textContent());
+
+    await pager.getByRole("link", { name: /Anterior/ }).click();
+    await expect(page).toHaveURL(/\/pecas\/processadores\?ordem=nome$/);
+    await expect(cards).toHaveCount(E2E_PAGE_SIZE);
+    expect(await cards.allTextContents()).toEqual(firstPage);
+  });
+
+  test("clamps a bad page number to the first or last page", async ({
+    page,
+  }) => {
+    const pager = page.getByRole("navigation", { name: "Paginação" });
+    for (const [pagina, shown] of [
+      ["99", "Página 2 de 2"],
+      ["0", "Página 1 de 2"],
+      ["abc", "Página 1 de 2"],
+    ] as const) {
       await page.goto(`/pecas/processadores?pagina=${pagina}`);
-      await expect(page.getByRole("article")).toHaveCount(6);
-      await expect(
-        page.getByRole("navigation", { name: "Paginação" }),
-      ).toHaveCount(0);
+      await expect(pager).toContainText(shown);
     }
   });
 
