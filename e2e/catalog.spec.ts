@@ -38,6 +38,20 @@ test.describe("category listing", () => {
     await expect(page.getByRole("article")).toHaveCount(6);
   });
 
+  // No seed category fills a page (12 parts), so only the edges are tested
+  // here; the page math is unit-tested in src/catalog/listing.test.ts.
+  test("falls back to the only page for a bad page number", async ({
+    page,
+  }) => {
+    for (const pagina of ["5", "0", "abc"]) {
+      await page.goto(`/pecas/processadores?pagina=${pagina}`);
+      await expect(page.getByRole("article")).toHaveCount(6);
+      await expect(
+        page.getByRole("navigation", { name: "Paginação" }),
+      ).toHaveCount(0);
+    }
+  });
+
   test("answers 404 for an unknown category", async ({ page }) => {
     const response = await page.goto("/pecas/monitores");
     expect(response?.status()).toBe(404);
