@@ -1,5 +1,6 @@
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "@/generated/prisma/client";
+import { pgConnectionString } from "./connection-string";
 
 /**
  * Creates a Prisma client over the pg driver adapter. Pages use the shared
@@ -10,5 +11,9 @@ export function createPrismaClient(
   connectionString = process.env.DATABASE_URL,
 ): PrismaClient {
   if (!connectionString) throw new Error("DATABASE_URL is not set");
-  return new PrismaClient({ adapter: new PrismaPg({ connectionString }) });
+  return new PrismaClient({
+    adapter: new PrismaPg({
+      connectionString: pgConnectionString(connectionString),
+    }),
+  });
 }
