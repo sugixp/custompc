@@ -1,8 +1,8 @@
 # Status
 
 Where the project stands, why it is built this way, and what comes next.
-Last updated 2026-10-28, after Phase 1 (stage 10), with the home page demo video and the
-processor icon.
+Last updated 2026-10-28: Phase 1 done, plus the home page demo video, the
+processor icon and share images.
 
 ## Where it stands
 
@@ -98,6 +98,16 @@ unreachable.
   WCAG AA (lowest pair 6.4:1). The mark is an original processor glyph
   (`ChipMark`), also the favicon (`app/icon.svg`, on a dark tile) and the
   Apple touch icon.
+- **Share images (Open Graph):** generated with `ImageResponse` in the
+  site's look, IBM Plex embedded from `assets/fonts` (WOFF from IBM's npm
+  packages under the OFL; `ImageResponse` cannot read the WOFF2 that
+  `next/font` serves). A default image (also the X image), one per category
+  and part with the current "a partir de" price, and one per shared build
+  at `/montar/imagem?<query>` with CPU, GPU, total and compatibility: a
+  route handler, because `opengraph-image` files never see the query
+  string. Links without known parts keep the default. Price-bearing images
+  are CDN-cached for an hour. Pages that set their own `openGraph` name the
+  default image explicitly, since that object replaces the inherited one.
 - **Home page demo video:** the README GIF, MP4, WebM and poster all come
   from one recording (`npm run demo:media`). It plays muted and inline
   from script, not the `autoplay` attribute, so with

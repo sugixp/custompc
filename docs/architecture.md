@@ -15,8 +15,11 @@ src/builder/   pure builder logic: URL encode/decode, slug resolution,
                pricing, candidate checks.
 src/catalog/   pure presentation logic for the catalog: category routes, pt-BR
                spec formatting, facets, sorting, pagination, offer summaries.
-src/server/    server-side adapters: the Prisma client and the Prisma-backed
-               OfferRepository.
+src/server/    server-side adapters: the Prisma client, the Prisma-backed
+               OfferRepository and the catalog and shared-build queries.
+src/og/        Open Graph images: what each card says (pure, tested) and
+               how it is drawn with ImageResponse and IBM Plex
+               (assets/fonts).
 src/app/       Next.js App Router pages; src/components holds their UI.
 src/proxy.ts   answers 404 for unknown category slugs before rendering.
 prisma/        schema, migrations and the seed script.
