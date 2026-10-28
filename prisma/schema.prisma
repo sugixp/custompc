@@ -1,0 +1,69 @@
+// Prisma ORM 7. The connection URL lives in prisma7.config.ts.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+/// Mirrors CATEGORIES in src/domain/parts/constants.ts.
+enum Category {
+  CPU
+  MOTHERBOARD
+  MEMORY
+  GPU
+  STORAGE
+  PSU
+  CASE
+  COOLER
+}
+
+model Part {
+  id             String   @id @default(cuid())
+  slug           String   @unique
+  category       Category
+  brand          String
+  model          String
+  /// Category-specific specs, validated with the Zod schemas in src/domain/parts.
+  specs          Json
+  /// Manufacturer pages the specs were taken from.
+  specSourceUrls String[]
+  offers         Offer[]
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([category])
+}
+
+model Store {
+  id      String  @id @default(cuid())
+  slug    String  @unique
+  name    String
+  siteUrl String
+  offers  Offer[]
+}
+
+/// One price per part per store. Marketplaces list many sellers per product;
+/// see "Known limitations" in docs/architecture.md.
+model Offer {
+  id         String   @id @default(cuid())
+  partId     String
+  storeId    String
+  /// Integer centavos, never floats.
+  priceCents Int
+  url        String
+  inStock    Boolean  @default(true)
+  /// When the price was seen at the store.
+  seenAt     DateTime
+  /// Id of the PriceProvider that produced the offer.
+  source     String
+  part       Part     @relation(fields: [partId], references: [id], onDelete: Cascade)
+  store      Store    @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  updatedAt  DateTime @updatedAt
+
+  @@unique([partId, storeId])
+  @@index([storeId])
+}
