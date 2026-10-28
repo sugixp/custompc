@@ -3,6 +3,11 @@
 PC builder for the Brazilian market: prices in R$, Brazilian stores,
 compatibility checks. Portfolio project, public repo `sugixp/custompc` (MIT).
 
+**State:** Phase 1 (MVP) closed on 2026-10-28 and paused. Demo at
+https://custompc-builder.vercel.app (custompc-six.vercel.app also works).
+Next steps, in order, are in STATUS.md: owner checks store links, BIOS
+scenario (waits for a hand-copied board list), Phase 2, affiliate idea.
+
 **Read [docs/STATUS.md](docs/STATUS.md) first**: current stage, decisions and
 their reasons, next steps. Architecture: [docs/architecture.md](docs/architecture.md).
 Compatibility rules: [docs/compatibility.md](docs/compatibility.md).
@@ -79,7 +84,9 @@ the daily "Price sync" workflow. Both workflows use the
 
 The agent runs the deploy through the Vercel CLI (`vercel`) and the Neon
 CLI (`neonctl`, project `floral-field-87906490`, org
-`org-misty-moon-54808836`) or the Neon MCP server when it fits better.
+`org-misty-moon-54808836`) or the Neon MCP server when it fits better. The
+demo answers at `custompc-builder.vercel.app` (a project domain) and
+`custompc-six.vercel.app`.
 
 - **Without asking:** read logs and status, preview deploys, create or
   change Preview and Development environment variables, create Neon

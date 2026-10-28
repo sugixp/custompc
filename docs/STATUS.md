@@ -1,8 +1,7 @@
 # Status
 
 Where the project stands, why it is built this way, and what comes next.
-Last updated 2026-10-28: Phase 1 done, plus the home page demo video, the
-processor icon and share images.
+Last updated 2026-10-28, at the close of Phase 1 (paused here).
 
 ## Where it stands
 
@@ -21,8 +20,10 @@ Phase 1 (MVP) is done: all 10 stages are on `main`, CI green:
 | 9     | E2E on its own database: keyboard, axe, offer age, errors, paging    |
 | 10    | Deploy (Vercel + Neon), final README (PT/EN) with the builder GIF    |
 
-Deployed at https://custompc-builder.vercel.app (Vercel + Neon, São Paulo),
-with example prices refreshed daily.
+Live at https://custompc-builder.vercel.app (Vercel + Neon, São Paulo;
+custompc-six.vercel.app also works), with example prices refreshed daily.
+After stage 10 came the home page demo video, the processor icon and site
+mark, and share images (Open Graph) for every page and shared build.
 
 CI runs three jobs on every push: lint/format/typecheck/unit tests/build
 (no database), migrate + seed + sync + idempotency on a fresh Postgres, and
@@ -98,6 +99,10 @@ unreachable.
   WCAG AA (lowest pair 6.4:1). The mark is an original processor glyph
   (`ChipMark`), also the favicon (`app/icon.svg`, on a dark tile) and the
   Apple touch icon.
+- **Demo address:** `custompc-builder.vercel.app`, chosen by the owner
+  (`custompc.vercel.app` belongs to someone else); `custompc-six` still
+  works. `SITE_URL` fixes it on every Vercel deploy, because
+  `VERCEL_PROJECT_PRODUCTION_URL` would keep the older, shorter domain.
 - **Share images (Open Graph):** generated with `ImageResponse` in the
   site's look, IBM Plex embedded from `assets/fonts` (WOFF from IBM's npm
   packages under the OFL; `ImageResponse` cannot read the WOFF2 that
@@ -117,11 +122,18 @@ unreachable.
 
 ## Next steps
 
-1. **BIOS-update scenario on real parts** is still missing. ASUS, MSI and
-   Gigabyte block automated access to CPU support lists; it needs a list
-   checked by hand (or a PDF) before `supportedCpus` can be filled.
-2. **Check the store search links by hand** in a browser. Only KaBuM!
-   answered `curl`; Amazon, Mercado Livre, Pichau and Terabyte block bots.
-3. **Phase 2**: sign-up/login (Auth.js: email + hashed password, Google,
-   GitHub), saved builds and favorite parts, privacy policy page (LGPD,
-   minimal user data).
+Phase 1 is closed; work is paused. In this order:
+
+1. **Check the store search links by hand** (owner). Only KaBuM! answered
+   `curl`; Amazon, Mercado Livre, Pichau and Terabyte block bots, so each
+   link needs a look in a browser.
+2. **BIOS-update scenario on real parts.** ASUS, MSI and Gigabyte block
+   automated access to CPU support lists. It waits for the owner to copy
+   one MSI or Gigabyte board's list by hand; then fill `supportedCpus` and
+   flag the CPUs that need an update.
+3. **Phase 2:** sign-up and login with Auth.js (email + hashed password,
+   Google, GitHub), saved builds, favorite parts, a privacy policy page
+   (LGPD, minimal user data).
+4. **Monetization through affiliate links**, as an idea: real price
+   collectors and affiliate ids live in a separate private repo that
+   implements `PriceProvider`; nothing of it enters this one.
