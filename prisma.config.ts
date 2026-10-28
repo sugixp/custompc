@@ -1,5 +1,5 @@
-// Prisma ORM 7 config. Prisma 7.10+ reads prisma7.config.ts so it does not
-// clash with the Prisma 8 format, which owns prisma.config.ts.
+// Prisma ORM 7 config (prisma is pinned to 7.x; the Prisma 8 CLI expects a
+// different format in this file).
 import "dotenv/config";
 import { defineConfig } from "prisma/config";
 
