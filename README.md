@@ -23,25 +23,42 @@ Prisma · Zod · Auth.js · Vitest · Playwright · GitHub Actions · Vercel
 
 ## Como rodar localmente
 
-Requisitos: Node.js 24 e npm.
+Requisitos: Node.js 24, npm e Docker (com Docker Compose).
 
 ```bash
-npm install
-cp .env.example .env
+npm install                # também gera o Prisma Client
+cp .env.example .env       # conexão com o Postgres local
+npm run db:up              # docker compose up -d --wait: sobe o Postgres 18
+npm run db:deploy          # aplica as migrations
+npm run db:seed            # carrega as peças de exemplo (pode rodar de novo)
 npm run dev
 ```
 
 Abra http://localhost:3000.
 
+O Postgres do Docker fica na porta **5433** do host, para não conflitar com
+um Postgres instalado direto na máquina. Para recomeçar do zero:
+`npm run db:reset`. Para parar o banco: `npm run db:down` (os dados ficam no
+volume `custompc-db`).
+
+> Os preços do seed são **ilustrativos**. As specs das peças são reais e cada
+> peça guarda a página do fabricante de onde vieram
+> ([docs/architecture.md](docs/architecture.md#seed-data)).
+
 ## Scripts
 
-| Comando             | O que faz                       |
-| ------------------- | ------------------------------- |
-| `npm run dev`       | Servidor de desenvolvimento     |
-| `npm run lint`      | ESLint                          |
-| `npm run typecheck` | Checagem de tipos do TypeScript |
-| `npm test`          | Testes unitários (Vitest)       |
-| `npm run format`    | Formata o código com Prettier   |
+| Comando              | O que faz                            |
+| -------------------- | ------------------------------------ |
+| `npm run dev`        | Servidor de desenvolvimento          |
+| `npm run lint`       | ESLint                               |
+| `npm run typecheck`  | Checagem de tipos do TypeScript      |
+| `npm test`           | Testes unitários (Vitest)            |
+| `npm run format`     | Formata o código com Prettier        |
+| `npm run db:up`      | Sobe o Postgres (Docker)             |
+| `npm run db:deploy`  | Aplica as migrations                 |
+| `npm run db:migrate` | Cria uma migration (desenvolvimento) |
+| `npm run db:seed`    | Carrega os dados de exemplo          |
+| `npm run db:reset`   | Recria o banco e roda o seed         |
 
 ## Roadmap
 
@@ -75,15 +92,24 @@ together. custompc does both.
 
 ### Running locally
 
-Requirements: Node.js 24 and npm.
+Requirements: Node.js 24, npm and Docker (with Docker Compose).
 
 ```bash
-npm install
-cp .env.example .env
+npm install                # also generates the Prisma Client
+cp .env.example .env       # local Postgres connection
+npm run db:up              # docker compose up -d --wait: starts Postgres 18
+npm run db:deploy          # applies the migrations
+npm run db:seed            # loads the example parts (safe to re-run)
 npm run dev
 ```
 
-Open http://localhost:3000. See the scripts table above.
+Open http://localhost:3000. Docker's Postgres listens on host port **5433**
+so it never clashes with a natively installed Postgres. `npm run db:reset`
+starts over; see the scripts table above.
+
+> Seed prices are **illustrative**. Part specs are real, and each part keeps
+> the manufacturer page they came from
+> ([docs/architecture.md](docs/architecture.md#seed-data)).
 
 ### License
 
