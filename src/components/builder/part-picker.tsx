@@ -45,7 +45,6 @@ export function PartPicker({
     const dialog = dialogRef.current;
     if (!dialog) return;
     if (category && !dialog.open) {
-      setQuery("");
       dialog.showModal();
       // showModal focuses the first control, "Fechar"; start at the search.
       searchRef.current?.focus();
@@ -80,7 +79,13 @@ export function PartPicker({
     <dialog
       ref={dialogRef}
       aria-labelledby={titleId}
-      onClose={onClose}
+      // The search is cleared on close (Esc, "Fechar" or a pick), not on
+      // open: an open-time reset lands a render late, so the last search
+      // flashes in the next picker and keys typed at once are appended to it.
+      onClose={() => {
+        setQuery("");
+        onClose();
+      }}
       className="m-auto max-h-[min(44rem,92dvh)] w-[min(40rem,calc(100vw-1.5rem))] overflow-hidden rounded-panel border border-line-strong bg-surface p-0 text-text backdrop:bg-black/70"
     >
       <div className="flex max-h-[inherit] flex-col">

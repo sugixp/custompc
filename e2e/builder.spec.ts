@@ -111,6 +111,19 @@ test("picks a part with the keyboard alone", async ({ page, isMobile }) => {
   await expect(slot(page, "CPU")).toContainText("AMD Ryzen 5 7600");
 });
 
+test("a picker opens with an empty search", async ({ page }) => {
+  await page.goto("/montar");
+  await pick(page, "CPU", "Processador", "7600", "AMD Ryzen 5 7600");
+
+  await page.getByRole("button", { name: "Escolher (Placa-mãe)" }).click();
+  const search = page
+    .getByRole("dialog", { name: "Escolher: Placa-mãe" })
+    .getByLabel("Buscar");
+  // Read once, without retrying: the last search used to show for a render
+  // and swallow the first keys typed.
+  expect(await search.inputValue()).toBe("");
+});
+
 test("shows the issues of a seed scenario and highlights the parts", async ({
   page,
 }) => {
