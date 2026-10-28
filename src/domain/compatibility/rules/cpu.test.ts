@@ -57,6 +57,11 @@ describe("cpuInMotherboardSupportList", () => {
       { motherboard: withSpecs(fx.motherboard, { supportedCpus: [] }) },
       [{ code: IssueCode.CpuNotInSupportList, categories: CPU_MB }],
     ],
+    [
+      "support list unknown",
+      { motherboard: withSpecs(fx.motherboard, { supportedCpus: undefined }) },
+      [],
+    ],
     // The socket error already covers it; no second issue.
     ["different socket", { cpu: intelCpu }, []],
     ["no CPU yet", { cpu: undefined }, []],

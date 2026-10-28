@@ -87,7 +87,11 @@ export const motherboardSpecsSchema = z.object({
   maxMemoryGb: positiveInt,
   m2Slots: nonNegativeInt,
   sataPorts: nonNegativeInt,
-  supportedCpus: z.array(supportedCpuSchema),
+  /**
+   * Absent when the vendor's support list has not been loaded yet; the
+   * support-list rule then stays silent instead of warning on every CPU.
+   */
+  supportedCpus: z.array(supportedCpuSchema).optional(),
 });
 
 /** Memory is sold as kits: moduleCount sticks of moduleCapacityGb each. */
@@ -129,7 +133,8 @@ export const psuSpecsSchema = z.object({
   wattageW: positiveInt,
   formFactor: psuFormFactorSchema,
   efficiency: z.enum(PSU_EFFICIENCY_RATINGS),
-  modularity: z.enum(PSU_MODULARITY),
+  /** Many spec sheets leave it out, so it is optional. */
+  modularity: z.enum(PSU_MODULARITY).optional(),
   connectors: pcieConnectorsSchema,
 });
 

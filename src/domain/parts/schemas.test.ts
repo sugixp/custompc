@@ -117,7 +117,7 @@ describe("MOTHERBOARD", () => {
         supportedCpus: [{ cpuSlug: "amd-ryzen-5-7600" }],
       },
     });
-    expect(parsed.specs.supportedCpus[0]?.requiresBiosUpdate).toBe(false);
+    expect(parsed.specs.supportedCpus?.[0]?.requiresBiosUpdate).toBe(false);
   });
 
   it("rejects negative M.2 slot counts", () => {

@@ -13,14 +13,18 @@ export const cpuSocketMatchesMotherboard: Rule = ({ cpu, motherboard }) => {
 };
 
 /**
- * Only runs when the sockets match: a socket mismatch is already an error, and
- * a missing support entry would just repeat it.
+ * Only runs when the sockets match (a socket mismatch is already an error, and
+ * a missing support entry would just repeat it) and when the board's support
+ * list is known.
  */
 export const cpuInMotherboardSupportList: Rule = ({ cpu, motherboard }) => {
   if (!cpu || !motherboard) return [];
   if (cpu.specs.socket !== motherboard.specs.socket) return [];
 
-  const entry = motherboard.specs.supportedCpus.find(
+  const { supportedCpus } = motherboard.specs;
+  if (!supportedCpus) return [];
+
+  const entry = supportedCpus.find(
     (supported) => supported.cpuSlug === cpu.slug,
   );
   if (!entry) {
