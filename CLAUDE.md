@@ -63,8 +63,9 @@ npm run build && npm run start -- -p 3100   # in another terminal
 npm run screenshots                          # writes docs/screenshots
 ```
 
-The README GIF comes from `npm run demo:gif` (needs `ffmpeg` on PATH),
-against the same server or, with `SCREENSHOT_BASE_URL`, production.
+The README GIF and the home page video (`public/demo`) come from
+`npm run demo:media` (needs `ffmpeg` on PATH), against the same server
+or, with `SCREENSHOT_BASE_URL`, production.
 
 Deploy (details in docs/architecture.md, "Deployment"): Vercel builds with
 `vercel-build`, which migrates production and each preview's own Neon

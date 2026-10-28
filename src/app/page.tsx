@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { CategoryGrid } from "@/components/category-grid";
 import { CompatibilityExample } from "@/components/compatibility-example";
+import { DemoVideo } from "@/components/demo-video";
 
 const STEPS = [
   {
@@ -67,6 +68,20 @@ export default function Home() {
             </li>
           ))}
         </ol>
+      </section>
+
+      <section aria-labelledby="demonstracao" className="pt-12">
+        <h2 id="demonstracao" className="text-xl font-semibold">
+          Veja o montador em ação
+        </h2>
+        <figure className="mt-5">
+          <DemoVideo />
+          <figcaption className="mt-3 text-sm text-muted">
+            Uma build montada peça por peça: com um Ryzen AM5 escolhido, a
+            placa-mãe AM4 aparece como incompatível e o motivo é explicado; no
+            fim, a build fica sem problemas, com o total em reais e por loja.
+          </figcaption>
+        </figure>
       </section>
 
       <section aria-labelledby="categorias" className="py-12">

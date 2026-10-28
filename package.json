@@ -25,7 +25,7 @@
     "prices:sync": "tsx scripts/sync-prices.ts",
     "test:e2e": "playwright test",
     "screenshots": "tsx scripts/screenshots.ts",
-    "demo:gif": "tsx scripts/demo-gif.ts"
+    "demo:media": "tsx scripts/demo-media.ts"
   },
   "dependencies": {
     "@prisma/adapter-pg": "7.10.1",

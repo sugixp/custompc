@@ -141,22 +141,22 @@ de desenvolvimento não é tocado.
 
 ## Scripts
 
-| Comando               | O que faz                                            |
-| --------------------- | ---------------------------------------------------- |
-| `npm run dev`         | Servidor de desenvolvimento                          |
-| `npm run lint`        | ESLint                                               |
-| `npm run typecheck`   | Checagem de tipos do TypeScript                      |
-| `npm test`            | Testes unitários (Vitest)                            |
-| `npm run test:e2e`    | Testes E2E e de acessibilidade (Playwright + axe)    |
-| `npm run screenshots` | Gera os screenshots em `docs/screenshots`            |
-| `npm run demo:gif`    | Grava o GIF do montador (precisa do ffmpeg)          |
-| `npm run format`      | Formata o código com Prettier                        |
-| `npm run db:up`       | Sobe o Postgres (Docker)                             |
-| `npm run db:deploy`   | Aplica as migrations                                 |
-| `npm run db:migrate`  | Cria uma migration (desenvolvimento)                 |
-| `npm run db:seed`     | Carrega os dados de exemplo                          |
-| `npm run db:reset`    | Recria o banco e roda o seed                         |
-| `npm run prices:sync` | Atualiza as ofertas a partir dos provedores de preço |
+| Comando               | O que faz                                             |
+| --------------------- | ----------------------------------------------------- |
+| `npm run dev`         | Servidor de desenvolvimento                           |
+| `npm run lint`        | ESLint                                                |
+| `npm run typecheck`   | Checagem de tipos do TypeScript                       |
+| `npm test`            | Testes unitários (Vitest)                             |
+| `npm run test:e2e`    | Testes E2E e de acessibilidade (Playwright + axe)     |
+| `npm run screenshots` | Gera os screenshots em `docs/screenshots`             |
+| `npm run demo:media`  | Grava o GIF e o vídeo do montador (precisa do ffmpeg) |
+| `npm run format`      | Formata o código com Prettier                         |
+| `npm run db:up`       | Sobe o Postgres (Docker)                              |
+| `npm run db:deploy`   | Aplica as migrations                                  |
+| `npm run db:migrate`  | Cria uma migration (desenvolvimento)                  |
+| `npm run db:seed`     | Carrega os dados de exemplo                           |
+| `npm run db:reset`    | Recria o banco e roda o seed                          |
+| `npm run prices:sync` | Atualiza as ofertas a partir dos provedores de preço  |
 
 ## Status e roadmap
 

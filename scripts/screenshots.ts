@@ -34,7 +34,12 @@ async function main() {
   const browser = await chromium.launch();
   try {
     for (const { name: viewport, options } of viewports) {
-      const context = await browser.newContext({ ...options, locale: "pt-BR" });
+      // Reduced motion keeps the home page demo on its poster.
+      const context = await browser.newContext({
+        ...options,
+        locale: "pt-BR",
+        reducedMotion: "reduce",
+      });
       const page = await context.newPage();
       for (const { name, path } of pages) {
         await page.goto(new URL(path, baseURL).href, {
