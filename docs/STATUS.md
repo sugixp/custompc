@@ -17,13 +17,13 @@ Phase 1 (MVP), stages 1–9 of 10 are done and on `main`, CI green:
 | 6     | `PriceProvider` boundary, `prices:sync`, offer freshness             |
 | 7     | Catalog UI (listing with URL filters, part pages), Playwright        |
 | 8     | Builder at `/montar`: URL state, live checks, totals, shareable link |
-| 9     | E2E: keyboard, axe, stale/expired offers, database down, pagination  |
+| 9     | E2E on its own database: keyboard, axe, offer age, errors, paging    |
 
 CI runs three jobs on every push: lint/format/typecheck/unit tests/build
 (no database), migrate + seed + sync + idempotency on a fresh Postgres, and
-Playwright E2E (desktop and Pixel 7) against a seeded production build,
-with some offers aged by a test provider and a second server whose
-database is unreachable.
+Playwright E2E (desktop and Pixel 7) against a production build over its
+own `custompc_test` database, plus a second server whose database is
+unreachable.
 
 ## Decisions and why
 
@@ -59,14 +59,21 @@ database is unreachable.
 - **Prisma pinned to 7.10.1:** npm's `latest` tag points at a Prisma 8
   release candidate. npm 11 blocks install scripts; `allowScripts` in
   package.json allows Prisma's, pinned to that version.
+- **E2E has its own database.** `e2e/global-setup.ts` drops and recreates
+  `custompc_test` on the `DATABASE_URL` server (it refuses any name not
+  ending in `_test`), then migrates, seeds and ages offers, so
+  `npm run test:e2e` works alone and never touches development data. Web
+  servers are never reused, so a dev server on 3100 cannot be tested by
+  mistake. Playwright starts the servers before the global setup; that is
+  fine because they connect on the first page request.
 - **E2E data comes through the real paths.** Stale and expired offers come
   from a test-only `PriceProvider` (`e2e/fixtures/aged-offers.ts`) run by
   `prices:sync`, not from rows written by the tests; it ages only coolers,
   which no other spec prices. The error page is tested on a second
   `next start` of the same build with an unreachable `DATABASE_URL`.
-- **Pagination has no E2E for page 2.** No seed category reaches 12 parts
-  and parts are never invented, so E2E covers only bad page numbers; the
-  page math is unit-tested.
+- **Page size from `CATALOG_PAGE_SIZE`** (default 12, read at request
+  time). The E2E server uses 5, so the 6 seed CPUs span two pages without
+  inventing parts.
 - **Picker focus:** it opens on the search box, and after the first pick
   of a single-part slot focus goes to that slot's "Trocar" (the opener is
   gone). Found by the keyboard E2E.

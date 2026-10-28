@@ -17,8 +17,8 @@ Compatibility rules: [docs/compatibility.md](docs/compatibility.md).
   when it is not obvious. Author `sugixp <sugisadao@gmail.com>`. Push to
   `main` after each finished step.
 - Before every commit: `npm run lint`, `npm run format:check`,
-  `npm run typecheck`, `npm test`; for UI changes also `npm run build` and
-  the E2E suite.
+  `npm run typecheck`, `npm test`; for UI changes also `npm run test:e2e`
+  (it builds).
 - Numbers carry their unit in the name (`lengthMm`, `tdpW`, `speedMts`);
   money is integer cents (`priceCents`), formatted with `formatBRL`.
 - Never invent part specs. Take them from the manufacturer page, keep the
@@ -48,15 +48,18 @@ npm run dev                 # http://localhost:3000
 
 On the owner's machine a native Postgres holds 5432, so `.env` uses 5433.
 
-E2E and screenshots run against a production build on port 3100. The
-offer specs also need some offers aged by a test provider (a later
-`db:seed` makes them fresh again); Playwright starts a second server on
-3101 with an unreachable database for the error-page spec:
+`npm run test:e2e` needs only the Postgres from `db:up`. It builds, resets
+a `custompc_test` database on the same server (migrations, seed, aged
+offers), and starts its own servers: 3100 on that database with 5 parts
+per listing page, 3101 with an unreachable database for the error page.
+The development database is never touched; ports 3100 and 3101 must be
+free. `E2E_SKIP_BUILD=1` reuses the last build.
+
+Screenshots read the development database through a server you start:
 
 ```bash
-PRICE_PROVIDERS=./e2e/fixtures/aged-offers.ts npm run prices:sync
-npm run build && npm run start -- -p 3100   # in another terminal
 npm run test:e2e
+npm run build && npm run start -- -p 3100   # in another terminal
 npm run screenshots                          # writes docs/screenshots
 ```
 
