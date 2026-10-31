@@ -75,14 +75,21 @@ configured. Without it, build, tests and CI run as they do in this repo.
 
 1. `npm run prices:sync` (a scheduled job in production) loads the providers
    named in `PRICE_PROVIDERS`.
-2. It reads the catalog (part slug, category, brand, model) and the store
-   slugs from the database, and calls `fetchOffers({ parts, now })` on each
-   provider.
+2. It reads the catalog (part slug, category, brand, model), the store
+   slugs, the stored offers' sources and dates, and the recorded product
+   links (`Listing`) from the database, and calls
+   `fetchOffers({ parts, now, listings })` on each provider.
 3. Every offer is validated with `providerOfferSchema` (integer cents, https
    url, `inStock`, `seenAt` as a `Date`). Offers for unknown parts or stores,
    for stores the provider did not declare, or seen in the future are
-   rejected and reported. One offer per part and store survives: the most
-   recently seen.
+   rejected and reported. One offer per part and store survives, by
+   **source priority** (`src/domain/pricing/sources.ts`): any real price,
+   hand-checked (`manual`) or collected, beats an illustrative `seed` one
+   whatever its `seenAt`; between equals, the most recently seen wins. A
+   stored offer keeps its slot until its own source expires it, so the
+   daily seed sync never overwrites a reference price (reported as
+   `outranked`) and an older spreadsheet never rolls a newer price back
+   (`superseded`). The seed only fills gaps.
 4. The survivors are upserted in one transaction. A provider that throws is
    reported and skipped; the others still sync, and the script exits with
    code 1 so a scheduler notices.
@@ -104,6 +111,26 @@ provider) and module specifiers of installed provider packages:
 
 A listed package that is not installed fails the sync with a clear message
 instead of silently falling back to example prices.
+
+### Reference prices from a spreadsheet
+
+Prices checked by hand at a store come in through
+`npm run prices:import -- file.csv`, which runs the same sync with the
+`manual` provider (`src/pricing/providers/manual-csv.ts`). Columns:
+`part_slug, store_slug, price_brl, url, checked_on, in_stock` (the last
+optional, blank meaning in stock); `data/prices.example.csv` is a
+fictitious example. The parser takes what Excel in Portuguese saves (`;` or
+`,`, decimal comma, `DD/MM/YYYY`, BOM, quotes). Rows with neither price nor
+date are skipped; any other bad row stops the import before the database is
+touched, with every problem listed by line. A link must belong to the row's
+store, and a check day counts from noon in São Paulo. `--dry-run` only
+validates; `--production` writes to `PRODUCTION_DATABASE_URL`.
+
+Each row's link is also recorded as a `Listing`, which outlives the offer.
+`npm run prices:template -- --parts …` writes the next blank sheet
+(`private/precos-YYYY-MM-DD.csv` by default, gitignored) with those links
+filled in, and the seed provider links its illustrative offers to them
+instead of a store search.
 
 ### Writing a private provider
 
@@ -155,17 +182,24 @@ A private repository would:
 ## Offer freshness
 
 `src/domain/pricing/freshness.ts` classifies offers by the time since
-`seenAt`:
+`seenAt`, with windows per source: hand-checked prices are checked less
+often than a collector runs.
 
-| Age          | Status    | In the UI                                    |
-| ------------ | --------- | -------------------------------------------- |
-| up to 7 days | `fresh`   | shown, counted in build totals               |
-| 7 to 30 days | `stale`   | shown as "desatualizado", left out of totals |
-| over 30 days | `expired` | hidden                                       |
+| Status    | Seed and collectors | `manual` | In the UI                                    |
+| --------- | ------------------- | -------- | -------------------------------------------- |
+| `fresh`   | up to 7 days        | 10 days  | shown, counted in build totals               |
+| `stale`   | up to 30 days       | 45 days  | shown as "desatualizado", left out of totals |
+| `expired` | after that          |          | hidden                                       |
 
 The sync never deletes offers. When a provider stops reporting one, it ages
 out on its own. The seed provider reports every offer as seen at sync time,
 so example prices stay fresh as long as the sync runs.
+
+Labels follow the source: a `manual` offer reads "preço de referência,
+conferido em DD/MM"; a `seed` one "ilustrativo", and so does an "a partir
+de" price that only the seed backs. Every total that counts a seed price
+(the builder total, each one-store total, the shared-build image) says
+"inclui preços ilustrativos". On a price tie a real offer is chosen.
 
 ## Rendering
 
@@ -222,11 +256,12 @@ fee.
 
 ## Data model
 
-| Model   | Purpose                                                                                                                                                                                                      |
-| ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `Part`  | One real product. `category` is a Postgres enum; `specs` is JSON validated by the Zod schema of that category (`src/domain/parts`); `specSourceUrls` lists the manufacturer pages the specs were taken from. |
-| `Store` | A Brazilian store (Amazon, Mercado Livre, KaBuM!, Pichau, Terabyte).                                                                                                                                         |
-| `Offer` | A price for one part at one store: `priceCents` (integer centavos), `url`, `inStock`, `seenAt` and `source`, the id of the price provider that produced it.                                                  |
+| Model     | Purpose                                                                                                                                                                                                      |
+| --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `Part`    | One real product. `category` is a Postgres enum; `specs` is JSON validated by the Zod schema of that category (`src/domain/parts`); `specSourceUrls` lists the manufacturer pages the specs were taken from. |
+| `Store`   | A Brazilian store (Amazon, Mercado Livre, KaBuM!, Pichau, Terabyte).                                                                                                                                         |
+| `Offer`   | A price for one part at one store: `priceCents` (integer centavos), `url`, `inStock`, `seenAt` and `source`, the id of the price provider that produced it.                                                  |
+| `Listing` | A part's product page at one store, recorded by `prices:import` (`url`, `seenAt` of the check, `source`). It outlives the offer, pre-fills the next spreadsheet and gives seed offers a product link.        |
 
 Specs live in one JSON column instead of a table per category. The schema
 stays small, and Zod gives each category its own strict type at the boundary.

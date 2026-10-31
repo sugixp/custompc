@@ -41,7 +41,7 @@ favorites move to Phase 3.
       high end; specs only from manufacturer pages, nothing invented; one
       demo scenario with the wrong memory generation (DDR4/DDR5) for the
       board. Done 2026-10-31: 120 parts, scenario `ddr5-on-d4-board`.
-- [ ] **Stage 2, reference prices:** `offerFreshness` per source (manual:
+- [x] **Stage 2, reference prices:** `offerFreshness` per source (manual:
       fresh up to 10 days, stale up to 45); `prices:import` from CSV
       (`part_slug, store_slug, price_brl, url, checked_on, in_stock?`)
       through a `"manual"` `PriceProvider` in the same sync; a fictitious
@@ -54,6 +54,8 @@ favorites move to Phase 3.
       "inclui preços ilustrativos". The CSV product URL is kept as a
       reusable part → listing mapping (where it lives to be proposed
       first if it needs a migration).
+      Done 2026-10-31: the owner chose a `Listing` table (migration); also
+      `prices:template` for the blank sheet.
 - [ ] **Stage 3, Mercado Livre:** guide the owner through creating the app;
       credentials only in `private/.env`, a test script in `private/`;
       nothing in the public repo.
@@ -93,7 +95,22 @@ favorites move to Phase 3.
   loaded only when listed in `PRICE_PROVIDERS`. Providers run in
   `npm run prices:sync`, never during a request.
 - **Offer freshness:** fresh up to 7 days, stale (shown, flagged, out of
-  totals) up to 30, then hidden. The sync never deletes offers.
+  totals) up to 30, then hidden; hand-checked (`manual`) prices 10 and 45,
+  since nobody checks a store by hand every day. The sync never deletes
+  offers.
+- **Source priority, not recency:** the daily sync runs only the seed and
+  the upsert overwrites, so a reference price would have lost to an
+  illustrative one the next morning. Any real price outranks the seed for
+  the same part and store, in the run and against what is stored, until its
+  own source expires it; the seed only fills gaps. The production seed stays,
+  so the demo is never empty. Every total that counts a seed price says
+  "inclui preços ilustrativos".
+- **Reference prices come from a spreadsheet** (`prices:import`), built for
+  what Excel in Portuguese saves, because the owner checks prices by hand in
+  a browser; stores block bots. Any bad row stops the whole import, so a
+  half-wrong sheet never lands. Each row's link is kept in `Listing` (chosen
+  over a local file so production has it too), which pre-fills the next
+  sheet and lets seed offers link to the product instead of a search.
 - **One offer per part per store** (`@@unique([partId, storeId])`), a known
   limitation for marketplaces with many sellers.
 - **Cache Components rendering:** anything reading the database,
