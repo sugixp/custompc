@@ -3,10 +3,10 @@
 PC builder for the Brazilian market: prices in R$, Brazilian stores,
 compatibility checks. Portfolio project, public repo `sugixp/custompc` (MIT).
 
-**State:** Phase 1 (MVP) closed on 2026-10-28 and paused. Demo at
-https://custompc-builder.vercel.app (custompc-six.vercel.app also works).
-Next steps, in order, are in STATUS.md: owner checks store links, BIOS
-scenario (waits for a hand-copied board list), Phase 2, affiliate idea.
+**State:** Phase 1 (MVP) closed on 2026-10-28. Phase 2 (catalog, reference
+prices, performance tiers, featured builds) in progress; its stage
+checklist is in STATUS.md. Demo at https://custompc-builder.vercel.app
+(custompc-six.vercel.app also works).
 
 **Read [docs/STATUS.md](docs/STATUS.md) first**: current stage, decisions and
 their reasons, next steps. Architecture: [docs/architecture.md](docs/architecture.md).

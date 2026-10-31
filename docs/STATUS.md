@@ -1,7 +1,7 @@
 # Status
 
 Where the project stands, why it is built this way, and what comes next.
-Last updated 2026-10-28, at the close of Phase 1 (paused here).
+Last updated 2026-10-30: Phase 1 closed on 2026-10-28; Phase 2 in progress.
 
 ## Where it stands
 
@@ -30,6 +30,43 @@ CI runs three jobs on every push: lint/format/typecheck/unit tests/build
 Playwright E2E (desktop and Pixel 7) against a production build over its
 own `custompc_test` database, plus a second server whose database is
 unreachable.
+
+## Phase 2 — in progress
+
+Plan approved by the owner on 2026-10-30. Phase 2 is now compatibility,
+recommendation and featured builds; sign-up, login, saved builds and
+favorites move to Phase 3.
+
+- [ ] **Stage 1, catalog:** 15 parts per category covering entry, mid and
+      high end; specs only from manufacturer pages, nothing invented; one
+      demo scenario with the wrong memory generation (DDR4/DDR5) for the
+      board.
+- [ ] **Stage 2, reference prices:** `offerFreshness` per source (manual:
+      fresh up to 10 days, stale up to 45); `prices:import` from CSV
+      (`part_slug, store_slug, price_brl, url, checked_on, in_stock?`)
+      through a `"manual"` `PriceProvider` in the same sync; a fictitious
+      example in `data/prices.example.csv`; label "preço de referência,
+      conferido em DD/MM".
+      The production seed stays. Priority by source: manual (and future
+      real providers) always beats the seed for the same part/store pair,
+      whatever the `seenAt`; the seed only fills gaps and is labeled
+      illustrative. Any total that includes an illustrative price says
+      "inclui preços ilustrativos". The CSV product URL is kept as a
+      reusable part → listing mapping (where it lives to be proposed
+      first if it needs a migration).
+- [ ] **Stage 3, Mercado Livre:** guide the owner through creating the app;
+      credentials only in `private/.env`, a test script in `private/`;
+      nothing in the public repo.
+- [ ] **Stage 4, performance:** GPU/CPU tiers (scale 1–6) as data with
+      published sources, never FPS; a pure
+      `usageProfiles(cpu, gpu, memory)`; `docs/performance.md`.
+- [ ] **Stage 5, featured builds:** Entrada/Intermediária/Alta in
+      `src/featured/builds.ts`, zero `checkBuild` errors (tested); home page
+      cards with the total (or "sem preço recente"), profiles, "por que"
+      and a Personalizar button; E2E.
+- [ ] **Stage 6, plan only:** `docs/recommendations.md` (bottleneck hints,
+      oversized PSU, cheaper alternative; "Monte por mim" as a pruned
+      search).
 
 ## Decisions and why
 
@@ -122,7 +159,7 @@ unreachable.
 
 ## Next steps
 
-Phase 1 is closed; work is paused. In this order:
+Phase 2 (above) is the current work. Besides it, in order:
 
 1. **Check the store search links by hand** (owner). Only KaBuM! answered
    `curl`; Amazon, Mercado Livre, Pichau and Terabyte block bots, so each
@@ -131,7 +168,7 @@ Phase 1 is closed; work is paused. In this order:
    automated access to CPU support lists. It waits for the owner to copy
    one MSI or Gigabyte board's list by hand; then fill `supportedCpus` and
    flag the CPUs that need an update.
-3. **Phase 2:** sign-up and login with Auth.js (email + hashed password,
+3. **Phase 3:** sign-up and login with Auth.js (email + hashed password,
    Google, GitHub), saved builds, favorite parts, a privacy policy page
    (LGPD, minimal user data).
 4. **Monetization through affiliate links**, as an idea: real price

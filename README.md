@@ -164,11 +164,13 @@ de desenvolvimento não é tocado.
   com ofertas e ficha técnica, montador com compatibilidade ao vivo, total
   em R$ e por loja, consumo e fonte recomendada, link compartilhável, E2E
   no CI e deploy.
-- ⏳ **Fase 2:** cadastro e login (e-mail e senha, Google, GitHub), builds e
+- ⏳ **Fase 2:** catálogo de 15 peças por categoria, preços de referência
+  conferidos à mão, faixas de desempenho por perfil de uso, builds em
+  destaque (Entrada, Intermediária, Alta) e o plano de recomendações.
+- **Fase 3:** cadastro e login (e-mail e senha, Google, GitHub), builds e
   peças favoritas salvas, política de privacidade (LGPD, mínimo de dados).
-- **Fase 3:** sugestões por custo, desempenho e popularidade; histórico de
-  preços.
-- **Futuro:** preços reais via pacote privado e links de afiliado.
+- **Futuro:** recomendações automáticas ("Monte por mim"), histórico de
+  preços, preços reais via pacote privado e links de afiliado.
 
 Pendências conhecidas: a lista de CPUs suportadas por cada placa (para o
 aviso de atualização de BIOS) precisa ser conferida à mão, porque os
@@ -274,11 +276,13 @@ The scripts table above lists the rest.
   offers and spec sheets, a builder with live compatibility, totals in R$
   and per store, power estimate and recommended PSU, shareable link, E2E in
   CI and deployment.
-- ⏳ **Phase 2:** sign-up and login (email and password, Google, GitHub),
+- ⏳ **Phase 2:** a 15-part catalog per category, hand-checked reference
+  prices, performance tiers per usage profile, featured builds (Entry, Mid,
+  High) and the recommendations plan.
+- **Phase 3:** sign-up and login (email and password, Google, GitHub),
   saved builds and favorite parts, privacy policy (LGPD, minimal data).
-- **Phase 3:** suggestions by cost, performance and popularity; price
-  history.
-- **Later:** real prices through the private package, affiliate links.
+- **Later:** automatic recommendations ("build it for me"), price history,
+  real prices through the private package, affiliate links.
 
 ### License
 
