@@ -24,6 +24,7 @@
     "db:studio": "prisma studio",
     "prices:sync": "tsx scripts/sync-prices.ts",
     "prices:import": "tsx scripts/import-prices.ts",
+    "prices:template": "tsx scripts/price-template.ts",
     "test:e2e": "playwright test",
     "screenshots": "tsx scripts/screenshots.ts",
     "demo:media": "tsx scripts/demo-media.ts"

@@ -7,6 +7,7 @@ import {
   parseInStock,
   parsePriceBrl,
   parsePriceCsv,
+  priceTemplateCsv,
 } from "./manual-csv";
 
 const now = new Date("2026-10-31T18:00:00Z");
@@ -178,5 +179,38 @@ describe("manualPriceProvider", () => {
       now: early,
     });
     expect(offer?.seenAt).toEqual(early);
+  });
+});
+
+describe("priceTemplateCsv", () => {
+  const rows = [
+    {
+      partSlug: "amd-ryzen-5-7600",
+      storeSlug: "kabum",
+      url: KABUM,
+      partName: "AMD Ryzen 5 7600",
+      searchUrl: "https://www.kabum.com.br/busca/AMD%20Ryzen%205%207600",
+    },
+    {
+      partSlug: "kingston-nv3-1tb",
+      storeSlug: "terabyte",
+      partName: 'Kingston NV3; "1TB"',
+      searchUrl: "https://www.terabyteshop.com.br/busca?str=x",
+    },
+  ];
+
+  it("writes what Excel in Portuguese opens: BOM, semicolons, CRLF", () => {
+    const text = priceTemplateCsv(rows);
+    expect(text.startsWith("﻿part_slug;store_slug;")).toBe(true);
+    expect(text.split("\r\n")[2]).toBe(
+      'kingston-nv3-1tb;terabyte;;;;;"Kingston NV3; ""1TB""";https://www.terabyteshop.com.br/busca?str=x',
+    );
+  });
+
+  it("imports as blank rows until filled in", () => {
+    const { offers, skipped, errors } = parse(priceTemplateCsv(rows));
+    expect(errors).toEqual([]);
+    expect(offers).toEqual([]);
+    expect(skipped).toEqual([2, 3]);
   });
 });

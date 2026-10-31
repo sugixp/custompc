@@ -10,8 +10,9 @@ import type { PriceProvider, ProviderOffer } from "../price-provider";
  * Built for what Excel in Portuguese writes: ";" or "," between fields
  * (whichever the header uses), a decimal comma or point, dates as
  * DD/MM/YYYY or YYYY-MM-DD, an optional UTF-8 BOM, quoted fields. in_stock
- * may be left blank (in stock). Rows whose price, url and checked_on are all
- * blank are skipped, so a half-filled template imports what is filled.
+ * may be left blank (in stock). Rows with neither price nor checked_on are
+ * skipped (a template may come with links filled in), so a half-filled
+ * template imports what is filled.
  */
 
 export const CSV_COLUMNS = [
@@ -176,7 +177,7 @@ export function parsePriceCsv(
       get("url"),
       get("checked_on"),
     ];
-    if (!price && !url && !checkedOn) {
+    if (!price && !checkedOn) {
       skipped.push(line);
       return;
     }
@@ -246,4 +247,45 @@ export function manualPriceProvider(
         }));
     },
   };
+}
+
+export interface TemplateRow {
+  partSlug: string;
+  storeSlug: string;
+  /** The recorded product page, when an earlier import left one. */
+  url?: string;
+  /** For the person filling it in; the import ignores these columns. */
+  partName: string;
+  searchUrl: string;
+}
+
+/** Quotes a field only when Excel would need it to. */
+const csvField = (value: string) =>
+  /[";\r\n]/.test(value) ? `"${value.replace(/"/g, '""')}"` : value;
+
+/**
+ * A blank spreadsheet for prices:import, as Excel in Portuguese opens it
+ * with a double click: ";" separators, CRLF and a UTF-8 BOM, so accents and
+ * columns come out right. Two extra columns, peca and busca, name the part
+ * and link to the store's search; the import ignores them.
+ */
+export function priceTemplateCsv(rows: readonly TemplateRow[]): string {
+  const lines = [
+    [...CSV_COLUMNS, "peca", "busca"].join(";"),
+    ...rows.map((row) =>
+      [
+        row.partSlug,
+        row.storeSlug,
+        "",
+        row.url ?? "",
+        "",
+        "",
+        row.partName,
+        row.searchUrl,
+      ]
+        .map(csvField)
+        .join(";"),
+    ),
+  ];
+  return `﻿${lines.join("\r\n")}\r\n`;
 }

@@ -160,6 +160,7 @@ de desenvolvimento não é tocado.
 | `npm run db:reset`                     | Recria o banco e roda o seed                          |
 | `npm run prices:sync`                  | Atualiza as ofertas a partir dos provedores de preço  |
 | `npm run prices:import -- arquivo.csv` | Importa preços de referência conferidos à mão         |
+| `npm run prices:template -- --parts …` | Gera a planilha em branco para o `prices:import`      |
 
 ## Status e roadmap
 
