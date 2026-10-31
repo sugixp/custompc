@@ -2,6 +2,7 @@ import { expect, test, type Page } from "@playwright/test";
 import { formatBRL } from "@/domain/money/money";
 import { exampleOffers, stores } from "@/seed";
 import { ALL_EXPIRED, ALL_STALE, MIXED } from "./fixtures/aged-offers";
+import { E2E_PAGE_SIZE } from "./servers";
 
 // The global setup ages some offers on top of the seed; see
 // e2e/fixtures/aged-offers.ts.
@@ -65,15 +66,17 @@ test("a part with only stale offers has no current price", async ({ page }) => {
   await expect(page.getByRole("main")).toContainText("Sem preço recente");
 
   // In the listing, sorted by price, the two parts without one come last:
-  // with 6 coolers and 5 per page, at the end of page 1 and on page 2.
+  // with 15 coolers and 5 per page, at the end of page 3.
   await page.goto("/pecas/coolers");
   const cards = page.getByRole("article");
   const unpriced = cards.filter({ hasText: "Sem preço recente" });
-  await expect(unpriced).toHaveCount(1);
+  await expect(cards).toHaveCount(E2E_PAGE_SIZE);
+  await expect(unpriced).toHaveCount(0);
+  await page.goto("/pecas/coolers?pagina=3");
+  await expect(cards).toHaveCount(E2E_PAGE_SIZE);
+  await expect(unpriced).toHaveCount(2);
+  await expect(cards.nth(E2E_PAGE_SIZE - 2)).toContainText("Sem preço recente");
   await expect(cards.last()).toContainText("Sem preço recente");
-  await page.goto("/pecas/coolers?pagina=2");
-  await expect(cards).toHaveCount(1);
-  await expect(unpriced).toHaveCount(1);
 });
 
 test("a part with only expired offers lists no store", async ({ page }) => {
