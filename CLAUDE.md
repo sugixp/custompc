@@ -58,7 +58,9 @@ a `custompc_test` database on the same server (migrations, seed, aged
 offers), and starts its own servers: 3100 on that database with 5 parts
 per listing page, 3101 with an unreachable database for the error page.
 The development database is never touched; ports 3100 and 3101 must be
-free. `E2E_SKIP_BUILD=1` reuses the last build.
+free. `E2E_SKIP_BUILD=1` reuses the last build. Outside CI Playwright runs
+2 workers: with the default count, Chromium crashed on the owner's machine
+(exit 0xC0000409, "Target crashed") alongside Docker and both servers.
 
 Screenshots read the development database through a server you start:
 

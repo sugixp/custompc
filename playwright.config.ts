@@ -20,6 +20,9 @@ export default defineConfig({
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,
+  // Locally, the default worker count crashed Chromium (0xC0000409) next to
+  // Docker and the two Next servers; CI keeps Playwright's default.
+  workers: process.env.CI ? undefined : 2,
   reporter: process.env.CI ? [["github"], ["list"]] : "list",
   use: {
     baseURL,
