@@ -4,12 +4,16 @@ import type { SeedPart } from "../types";
 // spec page; a "16-pin" connector is 12V-2x6/12VHPWR. ASUS does not list
 // board power, so boardPowerW is the chip vendor's reference figure (NVIDIA
 // "Total Graphics Power", AMD "Typical Board Power"); factory-overclocked
-// cards may draw somewhat more.
+// cards may draw somewhat more. Older generations: NVIDIA "Graphics Card Power",
+// AMD "Typical Board Power (Desktop)". ASUS lists dimensions without labels;
+// the first figure is the length. The Arc B580 is Intel's own Limited Edition,
+// whose dimensions, TBP, PSU and connector are on Intel's spec page.
 
 const ASUS_GPU = "https://www.asus.com/motherboards-components/graphics-cards";
-const NVIDIA = "https://www.nvidia.com/en-us/geforce/graphics-cards/50-series";
-const AMD =
-  "https://www.amd.com/en/products/graphics/desktops/radeon/9000-series";
+const NVIDIA_GPU = "https://www.nvidia.com/en-us/geforce/graphics-cards";
+const NVIDIA = `${NVIDIA_GPU}/50-series`;
+const AMD_GPU = "https://www.amd.com/en/products/graphics/desktops/radeon";
+const AMD = `${AMD_GPU}/9000-series`;
 
 export const gpus: SeedPart[] = [
   {
@@ -106,5 +110,194 @@ export const gpus: SeedPart[] = [
       `${AMD}/amd-radeon-rx-9070xt.html`,
     ],
     referencePriceCents: 529_990,
+  },
+  {
+    slug: "asus-dual-rtx-3050-6g",
+    category: "GPU",
+    brand: "ASUS",
+    model: "Dual GeForce RTX 3050 6GB",
+    specs: {
+      chipset: "GeForce RTX 3050",
+      memoryGb: 6,
+      lengthMm: 201,
+      boardPowerW: 70, // the 6 GB variant
+      recommendedPsuW: 450,
+      powerConnectors: { pcie8Pin: 0, pcie12v2x6: 0 }, // "Power Connectors: No"
+    },
+    specSourceUrls: [
+      `${ASUS_GPU}/dual/dual-rtx3050-6g/techspec/`,
+      `${NVIDIA_GPU}/30-series/rtx-3050/`,
+    ],
+    referencePriceCents: 119_990,
+  },
+  {
+    slug: "asus-dual-rx-6600-8g",
+    category: "GPU",
+    brand: "ASUS",
+    model: "Dual Radeon RX 6600 8GB",
+    specs: {
+      chipset: "Radeon RX 6600",
+      memoryGb: 8,
+      lengthMm: 243,
+      boardPowerW: 132,
+      recommendedPsuW: 500,
+      powerConnectors: { pcie8Pin: 1, pcie12v2x6: 0 },
+    },
+    specSourceUrls: [
+      `${ASUS_GPU}/dual/dual-rx6600-8g/techspec/`,
+      `${AMD_GPU}/6000-series/amd-radeon-rx-6600.html`,
+    ],
+    referencePriceCents: 129_990,
+  },
+  {
+    slug: "asus-dual-rtx-3060-o12g-v2",
+    category: "GPU",
+    brand: "ASUS",
+    model: "Dual GeForce RTX 3060 V2 OC 12GB",
+    specs: {
+      chipset: "GeForce RTX 3060",
+      memoryGb: 12,
+      lengthMm: 200, // "20 x 12.3 x 3.8 Centimeter"
+      boardPowerW: 170,
+      recommendedPsuW: 650,
+      powerConnectors: { pcie8Pin: 1, pcie12v2x6: 0 },
+    },
+    specSourceUrls: [
+      `${ASUS_GPU}/dual/dual-rtx3060-o12g-v2/techspec/`,
+      `${NVIDIA_GPU}/30-series/rtx-3060-3060ti/`,
+    ],
+    referencePriceCents: 179_990,
+  },
+  {
+    slug: "asus-dual-rtx-4060-o8g",
+    category: "GPU",
+    brand: "ASUS",
+    model: "Dual GeForce RTX 4060 OC 8GB",
+    specs: {
+      chipset: "GeForce RTX 4060",
+      memoryGb: 8,
+      lengthMm: 227,
+      boardPowerW: 115,
+      recommendedPsuW: 550,
+      powerConnectors: { pcie8Pin: 1, pcie12v2x6: 0 },
+    },
+    specSourceUrls: [
+      `${ASUS_GPU}/dual/dual-rtx4060-o8g/techspec/`,
+      `${NVIDIA_GPU}/40-series/rtx-4060-4060ti/`,
+    ],
+    referencePriceCents: 189_990,
+  },
+  {
+    slug: "asus-dual-rx-7600-o8g",
+    category: "GPU",
+    brand: "ASUS",
+    model: "Dual Radeon RX 7600 OC 8GB",
+    specs: {
+      chipset: "Radeon RX 7600",
+      memoryGb: 8,
+      lengthMm: 245,
+      boardPowerW: 165,
+      recommendedPsuW: 550,
+      powerConnectors: { pcie8Pin: 1, pcie12v2x6: 0 },
+    },
+    specSourceUrls: [
+      `${ASUS_GPU}/dual/dual-rx7600-o8g/techspec/`,
+      `${AMD_GPU}/7000-series/amd-radeon-rx-7600.html`,
+    ],
+    referencePriceCents: 169_990,
+  },
+  {
+    slug: "intel-arc-b580-limited-edition",
+    category: "GPU",
+    brand: "Intel",
+    model: "Arc B580 Limited Edition 12GB",
+    specs: {
+      chipset: "Arc B580",
+      memoryGb: 12,
+      lengthMm: 272,
+      boardPowerW: 190,
+      recommendedPsuW: 600, // "Minimum Power Supply Unit"
+      powerConnectors: { pcie8Pin: 1, pcie12v2x6: 0 },
+    },
+    specSourceUrls: [
+      "https://www.intel.com/content/www/us/en/products/sku/241598/intel-arc-b580-graphics/specifications.html",
+    ],
+    referencePriceCents: 189_990,
+  },
+  {
+    slug: "asus-prime-rtx-5060-ti-16g",
+    category: "GPU",
+    brand: "ASUS",
+    model: "Prime GeForce RTX 5060 Ti 16GB",
+    specs: {
+      chipset: "GeForce RTX 5060 Ti",
+      memoryGb: 16,
+      lengthMm: 304,
+      boardPowerW: 180,
+      recommendedPsuW: 550,
+      powerConnectors: { pcie8Pin: 1, pcie12v2x6: 0 },
+    },
+    specSourceUrls: [
+      `${ASUS_GPU}/prime/prime-rtx5060ti-16g/techspec/`,
+      `${NVIDIA}/rtx-5060-family/`,
+    ],
+    referencePriceCents: 309_990,
+  },
+  {
+    slug: "asus-prime-rx-9070-o16g",
+    category: "GPU",
+    brand: "ASUS",
+    model: "Prime Radeon RX 9070 OC 16GB",
+    specs: {
+      chipset: "Radeon RX 9070",
+      memoryGb: 16,
+      lengthMm: 312,
+      boardPowerW: 220,
+      recommendedPsuW: 650,
+      powerConnectors: { pcie8Pin: 2, pcie12v2x6: 0 },
+    },
+    specSourceUrls: [
+      `${ASUS_GPU}/prime/prime-rx9070-o16g/techspec/`,
+      `${AMD}/amd-radeon-rx-9070.html`,
+    ],
+    referencePriceCents: 459_990,
+  },
+  {
+    slug: "asus-prime-rtx-5070-ti-16g",
+    category: "GPU",
+    brand: "ASUS",
+    model: "Prime GeForce RTX 5070 Ti 16GB",
+    specs: {
+      chipset: "GeForce RTX 5070 Ti",
+      memoryGb: 16,
+      lengthMm: 304,
+      boardPowerW: 300,
+      recommendedPsuW: 750,
+      powerConnectors: { pcie8Pin: 0, pcie12v2x6: 1 },
+    },
+    specSourceUrls: [
+      `${ASUS_GPU}/prime/prime-rtx5070ti-16g/techspec/`,
+      `${NVIDIA}/rtx-5070-family/`,
+    ],
+    referencePriceCents: 649_990,
+  },
+  {
+    slug: "asus-tuf-rtx-5090-32g-gaming",
+    category: "GPU",
+    brand: "ASUS",
+    model: "TUF Gaming GeForce RTX 5090 32GB",
+    specs: {
+      chipset: "GeForce RTX 5090",
+      memoryGb: 32,
+      lengthMm: 348,
+      boardPowerW: 575,
+      recommendedPsuW: 1000,
+      powerConnectors: { pcie8Pin: 0, pcie12v2x6: 1 },
+    },
+    specSourceUrls: [
+      `${ASUS_GPU}/tuf-gaming/tuf-rtx5090-32g-gaming/techspec/`,
+      `${NVIDIA}/rtx-5090/`,
+    ],
+    referencePriceCents: 1_699_990,
   },
 ];
