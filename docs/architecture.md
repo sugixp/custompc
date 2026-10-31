@@ -126,6 +126,15 @@ touched, with every problem listed by line. A link must belong to the row's
 store, and a check day counts from noon in São Paulo. `--dry-run` only
 validates; `--production` writes to `PRODUCTION_DATABASE_URL`.
 
+**Which price goes in the sheet:** the cash price paid by PIX ("à vista no
+PIX"), the one Brazilian stores show in large type, not the card or
+installment total. A row is only filled when the store itself sells the part
+(KaBuM! "Vendido e entregue por: KaBuM!", Terabyte "Vendido por:
+TerabyteShop"; marketplace sellers are left out) and brand, exact model and
+capacity match the catalog part; an OC or "Pro" variant is a different part.
+Rows left blank carry the reason in an extra `motivo` column, which the
+import ignores like `peca` and `busca`.
+
 Each row's link is also recorded as a `Listing`, which outlives the offer.
 `npm run prices:template -- --parts …` writes the next blank sheet
 (`private/precos-YYYY-MM-DD.csv` by default, gitignored) with those links
@@ -195,8 +204,8 @@ The sync never deletes offers. When a provider stops reporting one, it ages
 out on its own. The seed provider reports every offer as seen at sync time,
 so example prices stay fresh as long as the sync runs.
 
-Labels follow the source: a `manual` offer reads "preço de referência,
-conferido em DD/MM"; a `seed` one "ilustrativo", and so does an "a partir
+Labels follow the source: a `manual` offer reads "à vista no PIX · preço de
+referência, conferido em DD/MM"; a `seed` one "ilustrativo", and so does an "a partir
 de" price that only the seed backs. Every total that counts a seed price
 (the builder total, each one-store total, the shared-build image) says
 "inclui preços ilustrativos". On a price tie a real offer is chosen.

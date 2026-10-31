@@ -7,9 +7,9 @@ export function SiteFooter() {
         <p className="max-w-prose">
           Projeto de portfólio em desenvolvimento. Os preços são{" "}
           <strong className="font-medium text-text">ilustrativos</strong>, salvo
-          os marcados como preço de referência, conferidos à mão na loja; as
-          especificações vêm dos sites dos fabricantes, com a fonte indicada em
-          cada peça.
+          os marcados como preço de referência, conferidos à mão na loja (à
+          vista no PIX); as especificações vêm dos sites dos fabricantes, com a
+          fonte indicada em cada peça.
         </p>
         <a
           href={REPOSITORY_URL}

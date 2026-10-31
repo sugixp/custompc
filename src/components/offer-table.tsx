@@ -108,7 +108,7 @@ export function OfferTable({ offers }: { offers: ShownOffer[] }) {
                   )}
                   {reference ? (
                     <span className="block text-xs text-muted">
-                      preço de referência, conferido em{" "}
+                      à vista no PIX · preço de referência, conferido em{" "}
                       {formatCheckedOn(offer.seenAt)}
                     </span>
                   ) : (

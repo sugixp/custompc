@@ -23,7 +23,7 @@ test("a reference price is labeled with its check day and sets the headline", as
   });
   await expect(reference).toHaveCount(REFERENCE.stores.length);
   await expect(reference.first()).toContainText(
-    `preço de referência, conferido em ${today}`,
+    `à vista no PIX · preço de referência, conferido em ${today}`,
   );
   await expect(reference.first()).toContainText(
     formatBRL(REFERENCE.priceCents),
