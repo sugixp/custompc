@@ -19,9 +19,9 @@ Monte seu PC com **preços em reais**, links para **lojas brasileiras** e
   gabinete, fonte, conectores da placa de vídeo…) num domínio em TypeScript
   puro, testado com objetos simples. O navegador roda o mesmo `checkBuild`
   do servidor, então cada regra existe uma vez só.
-- **Specs reais, nunca inventadas:** 120 peças (15 por categoria) com dados das páginas dos
-  fabricantes, cada uma guardando as URLs de origem. Campos que o fabricante
-  não publica ficam de fora.
+- **Specs reais, nunca inventadas:** 120 peças (15 por categoria) com
+  dados das páginas dos fabricantes, cada uma guardando as URLs de origem.
+  Campos que o fabricante não publica ficam de fora.
 - **A build inteira na URL** (`/montar?cpu=…&ram=…*2`): link compartilhável,
   renderizado no servidor, um único link por build.
 - **Fronteira público/privado:** a interface `PriceProvider` separa este
@@ -198,9 +198,9 @@ Portuguese).
   clearances, PSU wattage, GPU power connectors…) in a pure TypeScript
   domain, tested with plain objects. The browser runs the same `checkBuild`
   as the server, so every rule exists once.
-- **Real specs, never invented:** 120 parts (15 per category) with data from manufacturer
-  pages, each keeping its source URLs. Fields the manufacturer does not
-  publish are left out.
+- **Real specs, never invented:** 120 parts (15 per category) with data
+  from manufacturer pages, each keeping its source URLs. Fields the
+  manufacturer does not publish are left out.
 - **The whole build lives in the URL** (`/montar?cpu=…&ram=…*2`):
   shareable, server-rendered, exactly one link per build.
 - **Public/private boundary:** the `PriceProvider` interface separates this
