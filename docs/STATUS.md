@@ -1,7 +1,8 @@
 # Status
 
 Where the project stands, why it is built this way, and what comes next.
-Last updated 2026-10-30: Phase 1 closed on 2026-10-28; Phase 2 in progress.
+Last updated 2026-10-31: Phase 1 closed on 2026-10-28; Phase 2 in progress,
+paused after stage 2 (see "Paused on 2026-10-31" below).
 
 ## Where it stands
 
@@ -41,6 +42,8 @@ favorites move to Phase 3.
       high end; specs only from manufacturer pages, nothing invented; one
       demo scenario with the wrong memory generation (DDR4/DDR5) for the
       board. Done 2026-10-31: 120 parts, scenario `ddr5-on-d4-board`.
+      Later that day, 5 more that the stores actually sell (OC/Pro
+      variants and substitutes, see "Featured build swaps"): 125 parts.
 - [x] **Stage 2, reference prices:** `offerFreshness` per source (manual:
       fresh up to 10 days, stale up to 45); `prices:import` from CSV
       (`part_slug, store_slug, price_brl, url, checked_on, in_stock?`)
@@ -55,20 +58,93 @@ favorites move to Phase 3.
       reusable part → listing mapping (where it lives to be proposed
       first if it needs a migration).
       Done 2026-10-31: the owner chose a `Listing` table (migration); also
-      `prices:template` for the blank sheet.
-- [ ] **Stage 3, Mercado Livre:** guide the owner through creating the app;
-      credentials only in `private/.env`, a test script in `private/`;
-      nothing in the public repo.
+      `prices:template` for the blank sheet. The first sheet (KaBuM! and
+      Terabyte, featured-build parts) was filled from the owner's Chrome and
+      imported into the development database: 12 prices. The price is the
+      cash price by PIX, and the label says so: "à vista no PIX · preço de
+      referência, conferido em DD/MM".
+- [ ] **Stage 3, Mercado Livre — adiada: aguardando app do Mercado Livre.**
+      The probe script is ready in `private/ml-test.ts` (gitignored, with
+      `private/.env.example`); it prints the HTTP status and raw JSON of each
+      call. The API docs portal answered 403 to automated reads, so what the
+      API allows a new app is still unverified. Owner's steps: 1. At developers.mercadolivre.com.br, signed in with your account,
+      create an application: any name and description, a https Redirect
+      URI (e.g. `https://custompc-builder.vercel.app/`), read-only scope
+      (`read`; add `offline_access` only if needed for a refresh token);
+      no `write`, no notification topics. 2. Copy `private/.env.example` to `private/.env` and fill
+      `ML_CLIENT_ID`, `ML_CLIENT_SECRET`, `ML_REDIRECT_URI`. Never paste
+      the secret in chat or in a repo file. 3. Run `npx tsx private/ml-test.ts app-token`. If the API refuses the
+      app-only token, run `auth-url`, open the link, authorize, copy the
+      `?code=` from the redirect and run `token <code>`. Tokens go to
+      `private/.ml-tokens.json` and are never printed. 4. Then the agent runs `search`, `products`, `product-items` and `item`
+      and reports exactly what comes back (a 403 on `/sites/MLB/search`
+      would point to catalog search, `/products/search`, instead).
+      The agent never uses the owner's Chrome or logged-in session on the
+      Mercado Livre site to collect data.
 - [ ] **Stage 4, performance:** GPU/CPU tiers (scale 1–6) as data with
       published sources, never FPS; a pure
       `usageProfiles(cpu, gpu, memory)`; `docs/performance.md`.
 - [ ] **Stage 5, featured builds:** Entrada/Intermediária/Alta in
       `src/featured/builds.ts`, zero `checkBuild` errors (tested); home page
       cards with the total (or "sem preço recente"), profiles, "por que"
-      and a Personalizar button; E2E.
+      and a Personalizar button; E2E. Started 2026-10-31: the selection is
+      in `src/featured/builds.ts` with a one-line "por que" per part, and a
+      test requires zero issues (warnings included). Cards and E2E remain.
 - [ ] **Stage 6, plan only:** `docs/recommendations.md` (bottleneck hints,
       oversized PSU, cheaper alternative; "Monte por mim" as a pruned
       search).
+
+## Paused on 2026-10-31
+
+**Done today:** Phase 2 stages 1 and 2; the first reference-price sheet
+filled from the owner's Chrome (KaBuM! and Terabyte, one product page at a
+time, no login, no captcha met) and imported into development (12 prices);
+the PIX label; 5 catalog parts the stores sell; the featured-build
+selection in code. Stage 3 is postponed (above).
+
+### Featured build swaps (for the owner to review)
+
+Neither store sold these parts itself on 2026-10-31 (marketplace sellers do
+not count), so each was swapped for one that keeps its role, at a similar
+price, with `checkBuild` returning no issue at all:
+
+| Build         | Was                         | Now                              | Why                                                                                                               |
+| ------------- | --------------------------- | -------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| Entrada       | Ryzen 5 5600                | Ryzen 5 5500                     | Same role (6-core AM4 with Wraith Stealth); both stores sell it, around R$ 620 at KaBuM!; slower, PCIe 3.0 only.  |
+| Entrada       | ASUS Dual RX 6600 8GB       | ASRock RX 7600 Challenger 8GB OC | The RX 6600 was out of stock or absent; the RX 7600 is its successor, sold by KaBuM! (~R$ 1.920). Asks for 550 W. |
+| Entrada       | ASUS TUF Gaming 550W Bronze | Corsair CX650 (CP-9020278-BR)    | No TUF Bronze at either store; the CX650 is sold by both (~R$ 370–380) and covers the RX 7600's 550 W.            |
+| Intermediária | ASUS TUF Gaming 650W Bronze | Corsair CX650 (CP-9020278-BR)    | Same reason; 650 W for the 5060 Ti's 550 W.                                                                       |
+| Intermediária | Prime RTX 5060 Ti 16GB      | Prime RTX 5060 Ti 16GB OC        | Only the OC edition was sold (Terabyte); same size, PSU and connector.                                            |
+| Alta          | TUF RTX 5080 16GB           | TUF RTX 5080 16GB OC             | Only the OC edition was sold (KaBuM!); same 348 mm, 850 W and 16-pin.                                             |
+| Alta          | Liquid Freezer III 360      | Liquid Freezer III Pro 360       | Terabyte sells only the Pro; same 360 mm radiator and sockets.                                                    |
+
+The replaced parts stay in the catalog. Other build parts were also not
+sold by either store that day (DDR4-3200 2x8GB kit, Focus 2, Pop Air,
+Meshify 2, B650M-PLUS WIFI, DDR5-6000 2x32GB); they were not swapped,
+pending the owner's call.
+
+### Waiting on the owner
+
+1. **Mercado Livre app** (stage 3 steps above).
+2. **Review the swaps** in the table above.
+3. **Fill `private/precos-2026-10-31-trocas.csv`** (new and swapped parts,
+   12 rows, the known links already in; KaBuM! links came from the "Vendido
+   por: KaBuM!" filter, so check the seller on the page).
+4. **Authorize the production import.** Nothing was seeded or imported in
+   production today. When authorized, in this order:
+   1. Check the latest production deploy is Ready (it applies migrations).
+   2. Seed production so the 5 new parts exist: the "Seed production"
+      workflow (`gh workflow run "Seed production"`) or
+      `npm run db:seed:prod`.
+   3. `npm run prices:import -- private/precos-2026-10-31.csv --production --dry-run`,
+      then the same without `--dry-run` (needs `PRODUCTION_DATABASE_URL`
+      in the local `.env`).
+   4. Once filled, the same two commands for
+      `private/precos-2026-10-31-trocas.csv`.
+   5. Expect the next "Price sync" run to report the manual pairs as
+      `outranked`: the seed keeping off reference prices, as designed.
+
+**Next:** stage 4, performance tiers.
 
 ## Decisions and why
 
@@ -111,6 +187,13 @@ favorites move to Phase 3.
   half-wrong sheet never lands. Each row's link is kept in `Listing` (chosen
   over a local file so production has it too), which pre-fills the next
   sheet and lets seed offers link to the product instead of a search.
+- **The reference price is the cash price by PIX**, the one stores show in
+  large type; card and installment totals are higher. A row is filled only
+  when the store itself sells the part (not a marketplace seller) and brand,
+  exact model and capacity match. An OC or Pro edition is a different part
+  with its own manufacturer page, so it gets its own catalog entry.
+- **Featured builds use only parts a store sells itself**, checked on the
+  store's page; parts nobody sold were swapped (table above).
 - **One offer per part per store** (`@@unique([partId, storeId])`), a known
   limitation for marketplaces with many sellers.
 - **Cache Components rendering:** anything reading the database,
