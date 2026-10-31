@@ -1,4 +1,4 @@
-import type { PartRef, PriceProvider } from "./price-provider";
+import type { KnownListing, PartRef, PriceProvider } from "./price-provider";
 import {
   reconcileOffers,
   type AcceptedOffer,
@@ -13,7 +13,18 @@ export interface OfferRepository {
   listStoreSlugs(): Promise<string[]>;
   /** Every stored offer's key, source and seenAt, for source priority. */
   listOffers(): Promise<StoredOffer[]>;
+  listListings(): Promise<KnownListing[]>;
   upsertOffers(offers: readonly AcceptedOffer[]): Promise<void>;
+  /**
+   * Records product pages; a link replaces a stored one only when it was
+   * confirmed on the same day or later.
+   */
+  upsertListings(listings: readonly RecordedListing[]): Promise<void>;
+}
+
+export interface RecordedListing extends KnownListing {
+  seenAt: Date;
+  source: string;
 }
 
 export interface SyncReport {
@@ -37,17 +48,18 @@ export async function syncPrices({
   repository: OfferRepository;
   now?: Date;
 }): Promise<SyncReport> {
-  const [parts, storeSlugs, stored] = await Promise.all([
+  const [parts, storeSlugs, stored, listings] = await Promise.all([
     repository.listParts(),
     repository.listStoreSlugs(),
     repository.listOffers(),
+    repository.listListings(),
   ]);
 
   const results: ProviderResult[] = [];
   const failedProviders: SyncReport["failedProviders"] = [];
   for (const provider of providers) {
     try {
-      const offers = await provider.fetchOffers({ parts, now });
+      const offers = await provider.fetchOffers({ parts, now, listings });
       results.push({
         providerId: provider.id,
         storeSlugs: provider.storeSlugs,

@@ -15,6 +15,8 @@ function memoryRepository(
     listParts: async () => parts,
     listStoreSlugs: async () => storeSlugs,
     listOffers: async () => stored,
+    listListings: async () => [],
+    upsertListings: async () => {},
     upsertOffers: async (offers) => {
       written.push([...offers]);
     },
@@ -61,7 +63,7 @@ describe("syncPrices", () => {
       repository,
       now,
     });
-    expect(calls).toEqual([{ parts: [part], now }]);
+    expect(calls).toEqual([{ parts: [part], now, listings: [] }]);
   });
 
   it("writes the accepted offers in one call", async () => {

@@ -27,10 +27,19 @@ export interface PartRef {
   model: string;
 }
 
+/** A part's known product page at a store (see Listing in the schema). */
+export interface KnownListing {
+  partSlug: string;
+  storeSlug: string;
+  url: string;
+}
+
 export interface PriceRequest {
   parts: readonly PartRef[];
   /** The time of this sync run; providers may use it as seenAt. */
   now: Date;
+  /** Product pages recorded by earlier imports; providers may link to them. */
+  listings?: readonly KnownListing[];
 }
 
 /**

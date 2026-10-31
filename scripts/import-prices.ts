@@ -7,10 +7,13 @@
 //   npm run prices:import -- private/precos-2026-10-31.csv --production
 //
 // Any bad row stops the import before the database is touched, listing every
-// problem by line. --production writes to PRODUCTION_DATABASE_URL instead of
-// DATABASE_URL, as db:seed:prod does.
+// problem by line. Each row's url is recorded as the part's product page at
+// that store (Listing), for the next spreadsheet and the seed's links.
+// --production writes to PRODUCTION_DATABASE_URL instead of DATABASE_URL,
+// as db:seed:prod does.
 import "dotenv/config";
 import { readFileSync } from "node:fs";
+import { MANUAL_SOURCE } from "@/domain/pricing/sources";
 import {
   manualPriceProvider,
   parsePriceCsv,
@@ -68,17 +71,30 @@ async function main() {
   );
   const prisma = createPrismaClient(url);
   try {
+    const repository = prismaOfferRepository(prisma);
     const report = await syncPrices({
       providers: [provider],
-      repository: prismaOfferRepository(prisma),
+      repository,
       now,
     });
     console.log(formatSyncReport([provider.id], report));
-    if (report.rejected.length > 0) {
-      for (const { reason, detail } of report.rejected)
-        console.error(`Not written (${reason}): ${detail}`);
+    // Every row's link is kept for the next spreadsheet and the seed's links,
+    // even when its price lost to a newer one.
+    await repository.upsertListings(
+      offers.map(({ partSlug, storeSlug, url, seenAt }) => ({
+        partSlug,
+        storeSlug,
+        url,
+        seenAt: seenAt > now ? now : seenAt,
+        source: MANUAL_SOURCE,
+      })),
+    );
+    console.log(`Product links recorded: ${offers.length}`);
+    // A newer price already stored is expected when a sheet is re-imported.
+    for (const { reason, detail } of report.rejected)
+      console.log(`Not written (${reason}): ${detail}`);
+    if (report.rejected.some((r) => r.reason !== "superseded"))
       process.exitCode = 1;
-    }
   } finally {
     await prisma.$disconnect();
   }

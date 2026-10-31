@@ -40,6 +40,48 @@ export function prismaOfferRepository(prisma: PrismaClient): OfferRepository {
       }));
     },
 
+    async listListings() {
+      const listings = await prisma.listing.findMany({
+        select: {
+          url: true,
+          part: { select: { slug: true } },
+          store: { select: { slug: true } },
+        },
+      });
+      return listings.map(({ url, part, store }) => ({
+        partSlug: part.slug,
+        storeSlug: store.slug,
+        url,
+      }));
+    },
+
+    async upsertListings(listings) {
+      if (listings.length === 0) return;
+      // Same shape as upsertBatch; an import has at most a few hundred rows.
+      await prisma.$executeRaw`
+        INSERT INTO "Listing" ("id", "partId", "storeId", "url", "seenAt",
+          "source", "updatedAt")
+        SELECT gen_random_uuid()::text, p."id", s."id", l."url",
+          l."seenAt"::timestamptz AT TIME ZONE 'UTC', l."source",
+          now() AT TIME ZONE 'UTC'
+        FROM unnest(
+          ${listings.map((l) => l.partSlug)}::text[],
+          ${listings.map((l) => l.storeSlug)}::text[],
+          ${listings.map((l) => l.url)}::text[],
+          ${listings.map((l) => l.seenAt.toISOString())}::text[],
+          ${listings.map((l) => l.source)}::text[]
+        ) AS l("partSlug", "storeSlug", "url", "seenAt", "source")
+        JOIN "Part" p ON p."slug" = l."partSlug"
+        JOIN "Store" s ON s."slug" = l."storeSlug"
+        ON CONFLICT ("partId", "storeId") DO UPDATE SET
+          "url" = EXCLUDED."url",
+          "seenAt" = EXCLUDED."seenAt",
+          "source" = EXCLUDED."source",
+          "updatedAt" = EXCLUDED."updatedAt"
+        WHERE "Listing"."seenAt" <= EXCLUDED."seenAt"
+      `;
+    },
+
     async upsertOffers(offers) {
       if (offers.length === 0) return;
       // One transaction: a sync either lands completely or not at all. A

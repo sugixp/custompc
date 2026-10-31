@@ -38,6 +38,25 @@ describe("seedPriceProvider", () => {
     );
   });
 
+  it("links to a recorded product page instead of the store search", async () => {
+    const [first] = catalog;
+    const listing = {
+      partSlug: first!.slug,
+      storeSlug: "kabum",
+      url: "https://www.kabum.com.br/produto/123/x",
+    };
+    const offers = await seedPriceProvider.fetchOffers({
+      parts: [first!],
+      now,
+      listings: [listing],
+    });
+    const kabum = offers.find((offer) => offer.storeSlug === "kabum");
+    const others = offers.filter((offer) => offer.storeSlug !== "kabum");
+    if (kabum) expect(kabum.url).toBe(listing.url);
+    expect(others.every((offer) => offer.url !== listing.url)).toBe(true);
+    expect(offers.length).toBeGreaterThan(0);
+  });
+
   it("produces offers the sync accepts without rejections", async () => {
     const offers = await seedPriceProvider.fetchOffers({ parts: catalog, now });
     const { accepted, rejected } = reconcileOffers({

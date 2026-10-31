@@ -22,8 +22,8 @@ enum Category {
 }
 
 model Part {
-  id             String   @id @default(cuid())
-  slug           String   @unique
+  id             String    @id @default(cuid())
+  slug           String    @unique
   category       Category
   brand          String
   model          String
@@ -32,18 +32,20 @@ model Part {
   /// Manufacturer pages the specs were taken from.
   specSourceUrls String[]
   offers         Offer[]
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  listings       Listing[]
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
 
   @@index([category])
 }
 
 model Store {
-  id      String  @id @default(cuid())
-  slug    String  @unique
-  name    String
-  siteUrl String
-  offers  Offer[]
+  id       String    @id @default(cuid())
+  slug     String    @unique
+  name     String
+  siteUrl  String
+  offers   Offer[]
+  listings Listing[]
 }
 
 /// One price per part per store. Marketplaces list many sellers per product;
@@ -63,6 +65,26 @@ model Offer {
   part       Part     @relation(fields: [partId], references: [id], onDelete: Cascade)
   store      Store    @relation(fields: [storeId], references: [id], onDelete: Cascade)
   updatedAt  DateTime @updatedAt
+
+  @@unique([partId, storeId])
+  @@index([storeId])
+}
+
+/// A part's product page at a store, recorded when a reference price is
+/// imported. It outlives the offer: the next spreadsheet comes with the link
+/// filled in, and illustrative seed offers link to it instead of a search.
+model Listing {
+  id        String   @id @default(cuid())
+  partId    String
+  storeId   String
+  url       String
+  /// When the link was last confirmed (the check day of its CSV row).
+  seenAt    DateTime
+  /// Who recorded it: "manual" for prices:import.
+  source    String
+  part      Part     @relation(fields: [partId], references: [id], onDelete: Cascade)
+  store     Store    @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  updatedAt DateTime @updatedAt
 
   @@unique([partId, storeId])
   @@index([storeId])

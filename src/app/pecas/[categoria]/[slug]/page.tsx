@@ -112,8 +112,8 @@ export default async function PartPage({ params }: Props) {
             </h2>
             {illustrative && (
               <p className="mt-2 rounded-panel border border-warn/40 bg-warn/5 px-3 py-2 text-sm text-warn">
-                Preços marcados como ilustrativos são dados de exemplo; os links
-                deles levam à busca da peça em cada loja.
+                Preços marcados como ilustrativos são dados de exemplo, não o
+                preço da loja.
               </p>
             )}
             <div className="mt-3">
