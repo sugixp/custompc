@@ -219,4 +219,17 @@ export const coolers: SeedPart[] = [
     specSourceUrls: [`${ARCTIC}/Liquid-Freezer-III-420/ACFRE00137A`],
     referencePriceCents: 84_990,
   },
+  {
+    slug: "arctic-liquid-freezer-iii-pro-360",
+    category: "COOLER",
+    brand: "Arctic",
+    model: "Liquid Freezer III Pro 360",
+    specs: {
+      type: "aio",
+      radiatorSizeMm: 360,
+      supportedSockets: ["AM4", "AM5", "LGA1700", "LGA1851"],
+    },
+    specSourceUrls: [`${ARCTIC}/Liquid-Freezer-III-Pro-360/ACFRE00180A`],
+    referencePriceCents: 74_990,
+  },
 ];

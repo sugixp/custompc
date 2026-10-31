@@ -1,6 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
 import { formatBRL } from "@/domain/money/money";
-import { exampleOffers, stores } from "@/seed";
+import { exampleOffers, parts, stores } from "@/seed";
 import { ALL_EXPIRED, ALL_STALE, MIXED } from "./fixtures/aged-offers";
 import { E2E_PAGE_SIZE } from "./servers";
 
@@ -65,18 +65,29 @@ test("a part with only stale offers has no current price", async ({ page }) => {
   await expect(headline(page)).toHaveCount(0);
   await expect(page.getByRole("main")).toContainText("Sem preço recente");
 
-  // In the listing, sorted by price, the two parts without one come last:
-  // with 15 coolers and 5 per page, at the end of page 3.
+  // In the listing, sorted by price, the two parts without one come last.
+  const coolers = parts.filter((part) => part.category === "COOLER").length;
+  const lastPage = Math.ceil(coolers / E2E_PAGE_SIZE);
+  const onLastPage = coolers - (lastPage - 1) * E2E_PAGE_SIZE;
   await page.goto("/pecas/coolers");
   const cards = page.getByRole("article");
   const unpriced = cards.filter({ hasText: "Sem preço recente" });
   await expect(cards).toHaveCount(E2E_PAGE_SIZE);
   await expect(unpriced).toHaveCount(0);
-  await page.goto("/pecas/coolers?pagina=3");
-  await expect(cards).toHaveCount(E2E_PAGE_SIZE);
-  await expect(unpriced).toHaveCount(2);
-  await expect(cards.nth(E2E_PAGE_SIZE - 2)).toContainText("Sem preço recente");
-  await expect(cards.last()).toContainText("Sem preço recente");
+  const tail: string[] = [];
+  for (const pageNumber of [lastPage - 1, lastPage]) {
+    await page.goto(`/pecas/coolers?pagina=${pageNumber}`);
+    await expect(cards).toHaveCount(
+      pageNumber === lastPage ? onLastPage : E2E_PAGE_SIZE,
+    );
+    tail.push(...(await cards.allInnerTexts()));
+  }
+  expect(
+    tail.slice(-2).every((text) => text.includes("Sem preço recente")),
+  ).toBe(true);
+  expect(
+    tail.filter((text) => text.includes("Sem preço recente")),
+  ).toHaveLength(2);
 });
 
 test("a part with only expired offers lists no store", async ({ page }) => {

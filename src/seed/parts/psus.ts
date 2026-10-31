@@ -1,6 +1,7 @@
 import type { SeedPart } from "../types";
 
 // ASUS/ROG tech spec pages. "Intel Form Factor: ATX12V" is an ATX PSU.
+// Corsair lists "PSU Form Factor" and "PCIe 8-pin (6+2)" connector totals.
 // Connector counts are the "Cable Connectors" lines ("PCI-E 6+2-pin" counts as
 // 8-pin, a "16-pin" is 12V-2x6). The pages do not state modularity, so it is
 // left out. The ROG Thor 1000P2 page states no form factor, so it is not here.
@@ -231,5 +232,23 @@ export const psus: SeedPart[] = [
       `${ROG_PSU}/rog-loki/rog-loki-1200t-sfx-l-gaming-model/spec/`,
     ],
     referencePriceCents: 219_990,
+  },
+  {
+    // Corsair's page is the US SKU (CP-9020278-NA); Brazilian stores sell the
+    // same CX650 as CP-9020278-BR.
+    slug: "corsair-cx650",
+    category: "PSU",
+    brand: "Corsair",
+    model: "CX650 650W Bronze",
+    specs: {
+      wattageW: 650,
+      formFactor: "ATX",
+      efficiency: "80 Plus Bronze",
+      connectors: { pcie8Pin: 2, pcie12v2x6: 0 },
+    },
+    specSourceUrls: [
+      "https://www.corsair.com/us/en/p/psu/cp-9020278-na/cx-series-cx650-650-watt-80-plus-bronze-atx-power-supply-cp-9020278-na",
+    ],
+    referencePriceCents: 37_990,
   },
 ];

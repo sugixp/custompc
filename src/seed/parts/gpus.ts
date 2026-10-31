@@ -6,7 +6,8 @@ import type { SeedPart } from "../types";
 // "Total Graphics Power", AMD "Typical Board Power"); factory-overclocked
 // cards may draw somewhat more. Older generations: NVIDIA "Graphics Card Power",
 // AMD "Typical Board Power (Desktop)". ASUS lists dimensions without labels;
-// the first figure is the length. The Arc B580 is Intel's own Limited Edition,
+// the first figure is the length. ASRock's page labels them "Dimensions"
+// and states the recommended PSU and connector the same way. The Arc B580 is Intel's own Limited Edition,
 // whose dimensions, TBP, PSU and connector are on Intel's spec page.
 
 const ASUS_GPU = "https://www.asus.com/motherboards-components/graphics-cards";
@@ -299,5 +300,64 @@ export const gpus: SeedPart[] = [
       `${NVIDIA}/rtx-5090/`,
     ],
     referencePriceCents: 1_699_990,
+  },
+  // Variants the stores sell (checked 2026-10-31): the plain TUF 5080 and
+  // Prime 5060 Ti were not on sale, their OC editions were.
+  {
+    slug: "asus-tuf-rtx-5080-o16g-gaming",
+    category: "GPU",
+    brand: "ASUS",
+    model: "TUF Gaming GeForce RTX 5080 16GB OC",
+    specs: {
+      chipset: "GeForce RTX 5080",
+      memoryGb: 16,
+      lengthMm: 348,
+      boardPowerW: 360,
+      recommendedPsuW: 850,
+      powerConnectors: { pcie8Pin: 0, pcie12v2x6: 1 },
+    },
+    specSourceUrls: [
+      `${ASUS_GPU}/tuf-gaming/tuf-rtx5080-o16g-gaming/techspec/`,
+      `${NVIDIA}/rtx-5080/`,
+    ],
+    referencePriceCents: 869_990,
+  },
+  {
+    slug: "asus-prime-rtx-5060-ti-o16g",
+    category: "GPU",
+    brand: "ASUS",
+    model: "Prime GeForce RTX 5060 Ti 16GB OC",
+    specs: {
+      chipset: "GeForce RTX 5060 Ti",
+      memoryGb: 16,
+      lengthMm: 304,
+      boardPowerW: 180,
+      recommendedPsuW: 550,
+      powerConnectors: { pcie8Pin: 1, pcie12v2x6: 0 },
+    },
+    specSourceUrls: [
+      `${ASUS_GPU}/prime/prime-rtx5060ti-o16g/techspec/`,
+      `${NVIDIA}/rtx-5060-family/`,
+    ],
+    referencePriceCents: 319_990,
+  },
+  {
+    slug: "asrock-rx-7600-challenger-8g-oc",
+    category: "GPU",
+    brand: "ASRock",
+    model: "Radeon RX 7600 Challenger 8GB OC",
+    specs: {
+      chipset: "Radeon RX 7600",
+      memoryGb: 8,
+      lengthMm: 270, // "269.2 x 131.8 x 40.3 mm", rounded up
+      boardPowerW: 165,
+      recommendedPsuW: 550,
+      powerConnectors: { pcie8Pin: 1, pcie12v2x6: 0 },
+    },
+    specSourceUrls: [
+      "https://www.asrock.com/Graphics-Card/AMD/Radeon%20RX%207600%20Challenger%208GB%20OC/index.asp#Specification",
+      `${AMD_GPU}/7000-series/amd-radeon-rx-7600.html`,
+    ],
+    referencePriceCents: 179_990,
   },
 ];
