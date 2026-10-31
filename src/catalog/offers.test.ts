@@ -35,6 +35,25 @@ describe("summarizeOffers", () => {
     expect(summary.offers.map((o) => o.freshness)).toEqual(["stale"]);
   });
 
+  it("judges each offer by its own source's freshness window", () => {
+    const summary = summarizeOffers(
+      [
+        offer({ storeName: "seed", seenAt: daysAgo(9) }),
+        offer({ storeName: "manual", source: "manual", seenAt: daysAgo(9) }),
+        offer({ storeName: "old", source: "manual", seenAt: daysAgo(40) }),
+        offer({ storeName: "gone", source: "manual", seenAt: daysAgo(46) }),
+      ],
+      now,
+    );
+    expect(
+      summary.offers.map((o) => [o.storeName, o.freshness] as const),
+    ).toEqual([
+      ["manual", "fresh"],
+      ["old", "stale"],
+      ["seed", "stale"],
+    ]);
+  });
+
   it("says out of stock when fresh offers exist but none in stock", () => {
     const { price } = summarizeOffers([offer({ inStock: false })], now);
     expect(price).toEqual({ kind: "out-of-stock" });

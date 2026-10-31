@@ -10,7 +10,7 @@ export interface CatalogOffer {
   url: string;
   inStock: boolean;
   seenAt: Date;
-  /** Price provider id; "seed" means an illustrative example price. */
+  /** Price provider id; see src/domain/pricing/sources.ts. */
   source: string;
   /** True when the link carries an affiliate id (none do yet). */
   sponsored?: boolean;
@@ -24,7 +24,7 @@ export type PriceSummary =
   | { kind: "price"; fromCents: number }
   /** Fresh offers exist, but no store has the part in stock. */
   | { kind: "out-of-stock" }
-  /** No offer seen in the last OFFER_STALE_AFTER_DAYS days. */
+  /** No fresh offer: none seen within its source's stale window. */
   | { kind: "no-recent-price" };
 
 export interface OfferSummary {
@@ -44,7 +44,7 @@ export function summarizeOffers(
 ): OfferSummary {
   const shown: ShownOffer[] = [];
   for (const offer of offers) {
-    const freshness = offerFreshness(offer.seenAt, now);
+    const freshness = offerFreshness(offer.seenAt, now, offer.source);
     if (freshness !== "expired") shown.push({ ...offer, freshness });
   }
   shown.sort(

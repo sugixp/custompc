@@ -1,7 +1,7 @@
 import { formatSeenAt, formatSeenAtShort } from "@/catalog/format";
 import { storeLinkRel, type ShownOffer } from "@/catalog/offers";
 import { formatBRL } from "@/domain/money/money";
-import { OFFER_STALE_AFTER_DAYS } from "@/domain/pricing/freshness";
+import { DEFAULT_FRESHNESS } from "@/domain/pricing/freshness";
 
 function Badge({
   tone,
@@ -127,8 +127,8 @@ export function OfferTable({ offers }: { offers: ShownOffer[] }) {
         </tbody>
       </table>
       <p className="border-t border-line px-3 py-2 text-xs text-muted sm:px-4.5">
-        Preços vistos há mais de {OFFER_STALE_AFTER_DAYS} dias aparecem como
-        desatualizados e não entram no &quot;a partir de&quot;.
+        Preços vistos há mais de {DEFAULT_FRESHNESS.staleAfterDays} dias
+        aparecem como desatualizados e não entram no &quot;a partir de&quot;.
       </p>
     </div>
   );
