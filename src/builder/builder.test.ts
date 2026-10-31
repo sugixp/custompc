@@ -141,9 +141,49 @@ describe("priceBuild", () => {
 
   it("totals each store, best coverage first", () => {
     expect(result.stores).toEqual([
-      { storeSlug: "a", storeName: "A", totalCents: 1600, missing: 1 },
-      { storeSlug: "b", storeName: "B", totalCents: 900, missing: 2 },
+      {
+        storeSlug: "a",
+        storeName: "A",
+        totalCents: 1600,
+        missing: 1,
+        illustrative: true,
+      },
+      {
+        storeSlug: "b",
+        storeName: "B",
+        totalCents: 900,
+        missing: 2,
+        illustrative: true,
+      },
     ]);
+  });
+
+  it("flags totals that count an illustrative price", () => {
+    expect(result.illustrative).toBe(true);
+    const real = priceBuild([
+      {
+        part: cpu,
+        quantity: 1,
+        offers: [offer("a", 900, { source: "manual" }), offer("b", 950)],
+      },
+    ]);
+    expect(real.illustrative).toBe(false);
+    expect(real.stores.map((s) => [s.storeSlug, s.illustrative])).toEqual([
+      ["a", false],
+      ["b", true],
+    ]);
+  });
+
+  it("prefers a real price over an illustrative one at the same amount", () => {
+    const tie = priceBuild([
+      {
+        part: cpu,
+        quantity: 1,
+        offers: [offer("a", 900), offer("b", 900, { source: "manual" })],
+      },
+    ]);
+    expect(tie.lines[0]?.best?.storeSlug).toBe("b");
+    expect(tie.illustrative).toBe(false);
   });
 
   it("prices an empty build at zero", () => {
@@ -151,6 +191,7 @@ describe("priceBuild", () => {
       lines: [],
       totalCents: 0,
       unpriced: [],
+      illustrative: false,
       stores: [],
     });
   });

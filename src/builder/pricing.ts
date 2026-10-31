@@ -1,5 +1,6 @@
 import type { ShownOffer } from "@/catalog/offers";
 import type { Part } from "@/domain/parts";
+import { isIllustrative } from "@/domain/pricing/sources";
 
 /** One picked part and how many units of it. */
 export interface PricedLine {
@@ -22,6 +23,8 @@ export interface StoreTotal {
   totalCents: number;
   /** Lines this store cannot supply right now. */
   missing: number;
+  /** The total counts at least one illustrative seed price. */
+  illustrative: boolean;
 }
 
 export interface BuildPrice {
@@ -30,6 +33,8 @@ export interface BuildPrice {
   totalCents: number;
   /** Lines without a current offer in stock anywhere. */
   unpriced: Part[];
+  /** The total counts at least one illustrative seed price. */
+  illustrative: boolean;
   /** Buying everything at one store, best coverage first, then cheapest. */
   stores: StoreTotal[];
 }
@@ -44,9 +49,14 @@ const buyable = (offer: ShownOffer) =>
 export function priceBuild(lines: readonly PricedLine[]): BuildPrice {
   const priced: LinePrice[] = lines.map(({ part, quantity, offers }) => {
     const current = offers.filter(buyable);
+    // On a tie, a real price beats an illustrative one.
     const best = current.reduce<ShownOffer | null>(
       (cheapest, offer) =>
-        cheapest === null || offer.priceCents < cheapest.priceCents
+        cheapest === null ||
+        offer.priceCents < cheapest.priceCents ||
+        (offer.priceCents === cheapest.priceCents &&
+          isIllustrative(cheapest.source) &&
+          !isIllustrative(offer.source))
           ? offer
           : cheapest,
       null,
@@ -67,12 +77,15 @@ export function priceBuild(lines: readonly PricedLine[]): BuildPrice {
   const stores: StoreTotal[] = [...storeNames].map(([storeSlug, storeName]) => {
     let total = 0;
     let missing = 0;
+    let illustrative = false;
     for (const { offers, quantity } of lines) {
       const offer = offers.find((o) => o.storeSlug === storeSlug && buyable(o));
-      if (offer) total += offer.priceCents * quantity;
-      else missing += 1;
+      if (offer) {
+        total += offer.priceCents * quantity;
+        illustrative ||= isIllustrative(offer.source);
+      } else missing += 1;
     }
-    return { storeSlug, storeName, totalCents: total, missing };
+    return { storeSlug, storeName, totalCents: total, missing, illustrative };
   });
   stores.sort(
     (a, b) =>
@@ -85,6 +98,9 @@ export function priceBuild(lines: readonly PricedLine[]): BuildPrice {
     lines: priced,
     totalCents,
     unpriced: priced.filter((line) => !line.best).map((line) => line.part),
+    illustrative: priced.some(
+      (line) => line.best !== null && isIllustrative(line.best.source),
+    ),
     stores,
   };
 }

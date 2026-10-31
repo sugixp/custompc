@@ -15,6 +15,8 @@ export interface SharedBuild {
   gpu?: Part;
   /** Cheapest current price per part; unpriced parts left out. */
   totalCents: number;
+  /** The total counts at least one illustrative seed price. */
+  illustrative: boolean;
   errors: number;
   warnings: number;
 }
@@ -40,12 +42,14 @@ export function summarizeSharedBuild(
   if (lines.length === 0) return null;
 
   const issues = checkBuild(build);
+  const price = priceBuild(lines);
   return {
     lines,
     units: lines.reduce((sum, line) => sum + line.quantity, 0),
     cpu: build.cpu,
     gpu: build.gpu,
-    totalCents: priceBuild(lines).totalCents,
+    totalCents: price.totalCents,
+    illustrative: price.illustrative,
     errors: issues.filter((issue) => issue.severity === "error").length,
     warnings: issues.filter((issue) => issue.severity === "warning").length,
   };

@@ -1,10 +1,15 @@
 import { execSync } from "node:child_process";
+import { mkdtempSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import pg from "pg";
+import { referencePriceCsv } from "./fixtures/reference-prices";
 import { testDatabaseURL } from "./servers";
 
 /**
- * Recreates the E2E database before every run: migrations, the seed, then
- * the aged offers that e2e/offers.spec.ts expects. Playwright starts the web
+ * Recreates the E2E database before every run: migrations, the seed, the
+ * aged offers that e2e/offers.spec.ts expects, then reference prices from a
+ * spreadsheet (e2e/prices.spec.ts). Playwright starts the web
  * servers first, which is fine: they open no connection until a test asks
  * for a page.
  */
@@ -48,4 +53,7 @@ export default async function globalSetup() {
   run("npx tsx scripts/sync-prices.ts", {
     PRICE_PROVIDERS: "./e2e/fixtures/aged-offers.ts",
   });
+  const csv = join(mkdtempSync(join(tmpdir(), "custompc-e2e-")), "precos.csv");
+  writeFileSync(csv, referencePriceCsv(new Date()));
+  run(`npx tsx scripts/import-prices.ts "${csv}"`);
 }

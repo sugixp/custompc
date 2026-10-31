@@ -83,9 +83,9 @@ const zen = { ...fx.cpu, model: "Ryzen 9" } as Part;
 
 describe("sortListing", () => {
   const items = [
-    item(intel, { kind: "price", fromCents: 200 }),
+    item(intel, { kind: "price", fromCents: 200, illustrative: false }),
     item(amd, { kind: "no-recent-price" }),
-    item(zen, { kind: "price", fromCents: 100 }),
+    item(zen, { kind: "price", fromCents: 100, illustrative: false }),
   ];
 
   it("sorts by price, parts without a current price last", () => {

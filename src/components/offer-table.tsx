@@ -1,7 +1,12 @@
-import { formatSeenAt, formatSeenAtShort } from "@/catalog/format";
+import {
+  formatCheckedOn,
+  formatSeenAt,
+  formatSeenAtShort,
+} from "@/catalog/format";
 import { storeLinkRel, type ShownOffer } from "@/catalog/offers";
 import { formatBRL } from "@/domain/money/money";
-import { DEFAULT_FRESHNESS } from "@/domain/pricing/freshness";
+import { DEFAULT_FRESHNESS, freshnessPolicy } from "@/domain/pricing/freshness";
+import { isIllustrative, MANUAL_SOURCE } from "@/domain/pricing/sources";
 
 function Badge({
   tone,
@@ -37,6 +42,7 @@ export function OfferTable({ offers }: { offers: ShownOffer[] }) {
     );
   }
   const [first] = offers;
+  const hasReference = offers.some((offer) => offer.source === MANUAL_SOURCE);
   const best =
     first?.freshness === "fresh" && first.inStock ? first : undefined;
 
@@ -73,6 +79,7 @@ export function OfferTable({ offers }: { offers: ShownOffer[] }) {
           {offers.map((offer) => {
             const isBest = offer === best;
             const stale = offer.freshness === "stale";
+            const reference = offer.source === MANUAL_SOURCE;
             return (
               <tr key={offer.storeSlug}>
                 <th
@@ -94,17 +101,26 @@ export function OfferTable({ offers }: { offers: ShownOffer[] }) {
                   >
                     {formatBRL(offer.priceCents)}
                   </span>
-                  {offer.source === "seed" && (
+                  {isIllustrative(offer.source) && (
                     <span className="block text-xs text-muted">
                       ilustrativo
                     </span>
                   )}
-                  <span className="block text-xs whitespace-nowrap text-muted md:hidden">
-                    visto {formatSeenAtShort(offer.seenAt)}
-                  </span>
+                  {reference ? (
+                    <span className="block text-xs text-muted">
+                      preço de referência, conferido em{" "}
+                      {formatCheckedOn(offer.seenAt)}
+                    </span>
+                  ) : (
+                    <span className="block text-xs whitespace-nowrap text-muted md:hidden">
+                      visto {formatSeenAtShort(offer.seenAt)}
+                    </span>
+                  )}
                 </td>
                 <td className="tabular hidden px-3 py-3 align-top text-xs text-muted sm:px-4 md:table-cell">
-                  {formatSeenAt(offer.seenAt)}
+                  {reference
+                    ? formatCheckedOn(offer.seenAt)
+                    : formatSeenAt(offer.seenAt)}
                 </td>
                 <td className="px-3 py-3 text-right align-top sm:px-4">
                   <a
@@ -128,6 +144,8 @@ export function OfferTable({ offers }: { offers: ShownOffer[] }) {
       </table>
       <p className="border-t border-line px-3 py-2 text-xs text-muted sm:px-4.5">
         Preços vistos há mais de {DEFAULT_FRESHNESS.staleAfterDays} dias
+        {hasReference &&
+          ` (preços de referência: conferidos há mais de ${freshnessPolicy(MANUAL_SOURCE).staleAfterDays})`}{" "}
         aparecem como desatualizados e não entram no &quot;a partir de&quot;.
       </p>
     </div>

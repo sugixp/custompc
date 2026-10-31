@@ -2,6 +2,7 @@ import {
   offerFreshness,
   type OfferFreshness,
 } from "@/domain/pricing/freshness";
+import { isIllustrative } from "@/domain/pricing/sources";
 
 export interface CatalogOffer {
   storeSlug: string;
@@ -21,7 +22,8 @@ export interface ShownOffer extends CatalogOffer {
 }
 
 export type PriceSummary =
-  | { kind: "price"; fromCents: number }
+  /** illustrative: the cheapest price is a seed example, not a real one. */
+  | { kind: "price"; fromCents: number; illustrative: boolean }
   /** Fresh offers exist, but no store has the part in stock. */
   | { kind: "out-of-stock" }
   /** No fresh offer: none seen within its source's stale window. */
@@ -57,11 +59,16 @@ export function summarizeOffers(
 
   const fresh = shown.filter((offer) => offer.freshness === "fresh");
   const buyable = fresh.filter((offer) => offer.inStock);
+  const fromCents = Math.min(...buyable.map((o) => o.priceCents));
   const price: PriceSummary =
     buyable.length > 0
       ? {
           kind: "price",
-          fromCents: Math.min(...buyable.map((o) => o.priceCents)),
+          fromCents,
+          // A real price at the same amount backs the headline.
+          illustrative: buyable.every(
+            (o) => o.priceCents !== fromCents || isIllustrative(o.source),
+          ),
         }
       : fresh.length > 0
         ? { kind: "out-of-stock" }

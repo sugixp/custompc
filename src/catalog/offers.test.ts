@@ -26,7 +26,26 @@ describe("summarizeOffers", () => {
       ],
       now,
     );
-    expect(price).toEqual({ kind: "price", fromCents: 99_990 });
+    expect(price).toEqual({
+      kind: "price",
+      fromCents: 99_990,
+      illustrative: true,
+    });
+  });
+
+  it("marks the headline illustrative only when no real price matches it", () => {
+    const real = summarizeOffers(
+      [
+        offer({ storeName: "A", priceCents: 90_000 }),
+        offer({ storeName: "B", priceCents: 90_000, source: "manual" }),
+      ],
+      now,
+    );
+    expect(real.price).toEqual({
+      kind: "price",
+      fromCents: 90_000,
+      illustrative: false,
+    });
   });
 
   it("says 'sem preço recente' when only stale offers remain", () => {

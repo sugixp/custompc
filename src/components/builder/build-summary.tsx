@@ -15,6 +15,9 @@ import {
 const plural = (count: number, one: string, many: string) =>
   `${count} ${count === 1 ? one : many}`;
 
+/** Shown under every total that counts a seed example price. */
+const ILLUSTRATIVE_NOTE = "inclui preços ilustrativos";
+
 function issueSummary(errors: number, warnings: number): string {
   if (errors === 0 && warnings === 0)
     return "Nenhum problema de compatibilidade";
@@ -122,6 +125,9 @@ export function BuildSummary({
             <p className="tabular text-lg text-accent">
               {formatBRL(price.totalCents)}
             </p>
+            {price.illustrative && (
+              <p className="text-xs text-muted">{ILLUSTRATIVE_NOTE}</p>
+            )}
           </div>
           <a
             href="#resumo"
@@ -169,6 +175,11 @@ function PriceSection({
       >
         {formatBRL(price.totalCents)}
       </p>
+      {price.illustrative && (
+        <p className="text-sm text-warn" data-testid="illustrative-note">
+          {ILLUSTRATIVE_NOTE}
+        </p>
+      )}
       <p className="mt-1 text-xs text-muted">
         Menor preço atual de cada peça, em lojas diferentes. Frete não incluído.
       </p>
@@ -197,7 +208,14 @@ function PriceSection({
                       : `faltam ${plural(store.missing, "peça", "peças")}`}
                   </span>
                 </span>
-                <span className="tabular">{formatBRL(store.totalCents)}</span>
+                <span className="tabular text-right">
+                  {formatBRL(store.totalCents)}
+                  {store.illustrative && (
+                    <span className="block font-sans text-xs text-muted">
+                      {ILLUSTRATIVE_NOTE}
+                    </span>
+                  )}
+                </span>
               </li>
             ))}
           </ul>

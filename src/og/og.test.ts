@@ -36,7 +36,11 @@ function entries(prices: Record<string, number> = {}) {
       {
         part,
         offers: [offer(prices[part.slug] ?? 10_000)],
-        price: { kind: "price", fromCents: prices[part.slug] ?? 10_000 },
+        price: {
+          kind: "price",
+          fromCents: prices[part.slug] ?? 10_000,
+          illustrative: false,
+        },
       },
     ]),
   );
@@ -69,9 +73,9 @@ describe("categoryCard", () => {
 
   it("shows the lowest current price of the category", () => {
     const card = categoryCard(cpus, [
-      { kind: "price", fromCents: 120_000 },
+      { kind: "price", fromCents: 120_000, illustrative: false },
       { kind: "out-of-stock" },
-      { kind: "price", fromCents: 81_990 },
+      { kind: "price", fromCents: 81_990, illustrative: false },
     ]);
     expect(card.title).toBe("Processadores");
     expect(card.eyebrow).toBe("Peças · 3 modelos");
@@ -94,7 +98,11 @@ describe("partCard", () => {
   const cpu = catalog.get("amd-ryzen-5-7600")!;
 
   it("names the part with its key specs and price", () => {
-    const card = partCard(cpu, { kind: "price", fromCents: 115_990 });
+    const card = partCard(cpu, {
+      kind: "price",
+      fromCents: 115_990,
+      illustrative: false,
+    });
     expect(card.eyebrow).toBe("Processador");
     expect(card.title).toBe("AMD Ryzen 5 7600");
     expect(card.subtitle).toContain("AM5");
@@ -131,6 +139,20 @@ describe("buildCard", () => {
     expect(card.stat).toEqual({ label: "Total", value: `R$${NBSP}300,00` });
     expect(card.badge?.tone).toBe("error");
     expect(card.badge?.text).toMatch(/^\d+ problemas?$/);
+  });
+
+  it("says when the total counts an illustrative price", () => {
+    const bySlug = entries();
+    const cpu = bySlug.get("amd-ryzen-5-7600")!;
+    bySlug.set("amd-ryzen-5-7600", {
+      ...cpu,
+      offers: [{ ...offer(10_000), source: "seed" }],
+    });
+    const card = buildCard(shared("cpu=amd-ryzen-5-7600", bySlug)!);
+    expect(card.stat).toEqual({
+      label: "Total · inclui preços ilustrativos",
+      value: `R$${NBSP}100,00`,
+    });
   });
 
   it("counts quantities and says compatible with warnings", () => {

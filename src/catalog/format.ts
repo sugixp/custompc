@@ -42,3 +42,12 @@ const dateTimeShort = new Intl.DateTimeFormat("pt-BR", {
 
 /** Compact form for narrow screens: "27/10, 12:00". */
 export const formatSeenAtShort = (date: Date) => dateTimeShort.format(date);
+
+const dayMonth = new Intl.DateTimeFormat("pt-BR", {
+  day: "2-digit",
+  month: "2-digit",
+  timeZone: "America/Sao_Paulo",
+});
+
+/** The day a reference price was checked by hand: "31/10". */
+export const formatCheckedOn = (date: Date) => dayMonth.format(date);

@@ -118,7 +118,9 @@ test.describe("part page", () => {
       await expect(link).toHaveAttribute("target", "_blank");
       await expect(link).toHaveAttribute("rel", "noopener noreferrer");
     }
-    await expect(page.getByText(/Preços ilustrativos/)).toBeVisible();
+    await expect(
+      page.getByText(/Preços marcados como ilustrativos/),
+    ).toBeVisible();
   });
 
   test("has Open Graph metadata", async ({ page }) => {

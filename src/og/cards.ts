@@ -22,7 +22,10 @@ export function defaultCard(): OgCard {
 function priceStat(price: PriceSummary): OgCard["stat"] {
   switch (price.kind) {
     case "price":
-      return { label: "A partir de", value: formatBRL(price.fromCents) };
+      return {
+        label: price.illustrative ? "A partir de · ilustrativo" : "A partir de",
+        value: formatBRL(price.fromCents),
+      };
     case "out-of-stock":
       return { label: "Preço", value: "Fora de estoque", muted: true };
     case "no-recent-price":
@@ -35,18 +38,23 @@ export function categoryCard(
   route: CategoryRoute,
   prices: readonly PriceSummary[],
 ): OgCard {
-  const cents = prices.flatMap((price) =>
-    price.kind === "price" ? [price.fromCents] : [],
+  const priced = prices.flatMap((price) =>
+    price.kind === "price" ? [price] : [],
+  );
+  const lowest = priced.reduce<PriceSummary>(
+    (best, price) =>
+      best.kind !== "price" ||
+      price.fromCents < best.fromCents ||
+      (price.fromCents === best.fromCents && !price.illustrative)
+        ? price
+        : best,
+    { kind: "no-recent-price" },
   );
   return {
     eyebrow: `Peças · ${prices.length} ${prices.length === 1 ? "modelo" : "modelos"}`,
     title: route.label,
     subtitle: route.description,
-    stat: priceStat(
-      cents.length > 0
-        ? { kind: "price", fromCents: Math.min(...cents) }
-        : { kind: "no-recent-price" },
-    ),
+    stat: priceStat(lowest),
   };
 }
 
@@ -63,7 +71,8 @@ const count = (n: number, one: string, many: string) =>
   `${n} ${n === 1 ? one : many}`;
 
 export function buildCard(shared: SharedBuild): OgCard {
-  const { lines, cpu, gpu, units, totalCents, errors, warnings } = shared;
+  const { lines, cpu, gpu, units, totalCents, illustrative, errors, warnings } =
+    shared;
   const row = (part: Part) => ({
     label: CATEGORY_LABELS[part.category],
     value: `${part.brand} ${part.model}`,
@@ -77,7 +86,12 @@ export function buildCard(shared: SharedBuild): OgCard {
     rows: shown.map(row),
     stat:
       totalCents > 0
-        ? { label: "Total", value: formatBRL(totalCents) }
+        ? {
+            label: illustrative
+              ? "Total · inclui preços ilustrativos"
+              : "Total",
+            value: formatBRL(totalCents),
+          }
         : { label: "Total", value: "Sem preço recente", muted: true },
     badge:
       errors > 0

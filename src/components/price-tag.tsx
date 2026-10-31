@@ -19,7 +19,12 @@ export function PriceTag({
   }
   return (
     <p className="flex flex-col">
-      <span className="spec-label">A partir de</span>
+      <span className="spec-label">
+        A partir de
+        {price.illustrative && (
+          <span className="tracking-normal normal-case"> · ilustrativo</span>
+        )}
+      </span>
       <span
         className={`tabular font-medium text-accent ${size === "lg" ? "text-3xl" : "text-lg"}`}
       >

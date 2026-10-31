@@ -11,6 +11,7 @@ import { OfferTable } from "@/components/offer-table";
 import { PriceTag } from "@/components/price-tag";
 import { SpecTable } from "@/components/spec-table";
 import { formatBRL } from "@/domain/money/money";
+import { isIllustrative } from "@/domain/pricing/sources";
 import { getCatalogPart } from "@/server/catalog";
 
 type Props = PageProps<"/pecas/[categoria]/[slug]">;
@@ -49,7 +50,9 @@ export default async function PartPage({ params }: Props) {
     permanentRedirect(partPath(part.category, part.slug));
 
   const summary = summarizeOffers(offers, now);
-  const illustrative = summary.offers.some((offer) => offer.source === "seed");
+  const illustrative = summary.offers.some((offer) =>
+    isIllustrative(offer.source),
+  );
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8">
@@ -109,8 +112,8 @@ export default async function PartPage({ params }: Props) {
             </h2>
             {illustrative && (
               <p className="mt-2 rounded-panel border border-warn/40 bg-warn/5 px-3 py-2 text-sm text-warn">
-                Preços ilustrativos: esta versão usa dados de exemplo. Os links
-                levam à busca da peça em cada loja.
+                Preços marcados como ilustrativos são dados de exemplo; os links
+                deles levam à busca da peça em cada loja.
               </p>
             )}
             <div className="mt-3">
