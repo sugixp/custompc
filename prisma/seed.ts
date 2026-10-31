@@ -48,7 +48,9 @@ async function main() {
     repository: prismaOfferRepository(prisma),
   });
   console.log(formatSyncReport([seedPriceProvider.id], report));
-  if (report.rejected.length > 0 || report.failedProviders.length > 0) {
+  // "outranked" is expected: a reference price holds its slot against the seed.
+  const unexpected = report.rejected.filter((r) => r.reason !== "outranked");
+  if (unexpected.length > 0 || report.failedProviders.length > 0) {
     throw new Error(
       "The seed price provider produced offers the sync rejected",
     );

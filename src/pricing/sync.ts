@@ -4,12 +4,15 @@ import {
   type AcceptedOffer,
   type ProviderResult,
   type RejectedOffer,
+  type StoredOffer,
 } from "./reconcile";
 
 /** What the sync needs from storage; src/server implements it with Prisma. */
 export interface OfferRepository {
   listParts(): Promise<PartRef[]>;
   listStoreSlugs(): Promise<string[]>;
+  /** Every stored offer's key, source and seenAt, for source priority. */
+  listOffers(): Promise<StoredOffer[]>;
   upsertOffers(offers: readonly AcceptedOffer[]): Promise<void>;
 }
 
@@ -34,9 +37,10 @@ export async function syncPrices({
   repository: OfferRepository;
   now?: Date;
 }): Promise<SyncReport> {
-  const [parts, storeSlugs] = await Promise.all([
+  const [parts, storeSlugs, stored] = await Promise.all([
     repository.listParts(),
     repository.listStoreSlugs(),
+    repository.listOffers(),
   ]);
 
   const results: ProviderResult[] = [];
@@ -62,6 +66,7 @@ export async function syncPrices({
     partSlugs: new Set(parts.map((part) => part.slug)),
     storeSlugs: new Set(storeSlugs),
     now,
+    stored,
   });
   await repository.upsertOffers(accepted);
 

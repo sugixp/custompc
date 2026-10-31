@@ -3,6 +3,7 @@ import {
   MAX_CLOCK_SKEW_MS,
   reconcileOffers,
   type ProviderResult,
+  type StoredOffer,
 } from "./reconcile";
 
 const now = new Date("2026-11-10T12:00:00Z");
@@ -24,14 +25,26 @@ const result = (providerId: string, offers: unknown[]): ProviderResult => ({
   offers,
 });
 
-function reconcile(results: ProviderResult[]) {
+function reconcile(results: ProviderResult[], stored: StoredOffer[] = []) {
   return reconcileOffers({
     results,
     partSlugs: new Set(["amd-ryzen-5-7600", "intel-core-i5-14400f"]),
     storeSlugs: new Set(["kabum", "pichau", "amazon"]),
     now,
+    stored,
   });
 }
+
+const daysAgo = (days: number) => new Date(now.getTime() - days * 86_400_000);
+
+const storedOffer = (source: string, seenAt: Date): StoredOffer => ({
+  partSlug: "amd-ryzen-5-7600",
+  storeSlug: "kabum",
+  source,
+  seenAt,
+});
+
+const KEY = "amd-ryzen-5-7600@kabum";
 
 describe("reconcileOffers", () => {
   it("accepts a valid offer and tags its source", () => {
@@ -112,5 +125,64 @@ describe("reconcileOffers", () => {
     ]);
     expect(accepted).toHaveLength(1);
     expect(rejected).toHaveLength(1);
+  });
+});
+
+describe("source priority", () => {
+  it("lets a real price beat the seed in the same run, however old", () => {
+    const { accepted, rejected } = reconcile([
+      result("seed", [offer()]),
+      result("manual", [offer({ seenAt: daysAgo(9), priceCents: 99_990 })]),
+    ]);
+    expect(accepted.map((o) => o.source)).toEqual(["manual"]);
+    expect(rejected).toEqual([
+      { source: "seed", reason: "superseded", detail: KEY },
+    ]);
+  });
+
+  it("keeps a stored reference price against the daily seed sync", () => {
+    const { accepted, rejected } = reconcile(
+      [result("seed", [offer()])],
+      [storedOffer("manual", daysAgo(30))],
+    );
+    expect(accepted).toEqual([]);
+    expect(rejected).toEqual([
+      { source: "seed", reason: "outranked", detail: KEY },
+    ]);
+  });
+
+  it("lets the seed fill the slot once the reference price expired", () => {
+    const { accepted } = reconcile(
+      [result("seed", [offer()])],
+      [storedOffer("manual", daysAgo(46))],
+    );
+    expect(accepted.map((o) => o.source)).toEqual(["seed"]);
+  });
+
+  it("replaces a stored seed offer with a real price", () => {
+    const { accepted } = reconcile(
+      [result("manual", [offer({ seenAt: daysAgo(2) })])],
+      [storedOffer("seed", now)],
+    );
+    expect(accepted.map((o) => o.source)).toEqual(["manual"]);
+  });
+
+  it("never rolls a newer reference price back to an older one", () => {
+    const { accepted, rejected } = reconcile(
+      [result("manual", [offer({ seenAt: daysAgo(5) })])],
+      [storedOffer("manual", daysAgo(2))],
+    );
+    expect(accepted).toEqual([]);
+    expect(rejected).toEqual([
+      { source: "manual", reason: "superseded", detail: KEY },
+    ]);
+  });
+
+  it("refreshes a stored offer of the same source with a newer one", () => {
+    const { accepted } = reconcile(
+      [result("seed", [offer()])],
+      [storedOffer("seed", daysAgo(1))],
+    );
+    expect(accepted.map((o) => o.source)).toEqual(["seed"]);
   });
 });

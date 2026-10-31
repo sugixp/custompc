@@ -23,6 +23,23 @@ export function prismaOfferRepository(prisma: PrismaClient): OfferRepository {
       return stores.map((store) => store.slug);
     },
 
+    async listOffers() {
+      const offers = await prisma.offer.findMany({
+        select: {
+          source: true,
+          seenAt: true,
+          part: { select: { slug: true } },
+          store: { select: { slug: true } },
+        },
+      });
+      return offers.map(({ source, seenAt, part, store }) => ({
+        partSlug: part.slug,
+        storeSlug: store.slug,
+        source,
+        seenAt,
+      }));
+    },
+
     async upsertOffers(offers) {
       if (offers.length === 0) return;
       // One transaction: a sync either lands completely or not at all. A

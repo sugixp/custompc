@@ -1,15 +1,20 @@
 import { describe, expect, it } from "vitest";
 import type { PartRef, PriceProvider } from "./price-provider";
-import type { AcceptedOffer } from "./reconcile";
+import type { AcceptedOffer, StoredOffer } from "./reconcile";
 import { syncPrices, type OfferRepository } from "./sync";
 
 const now = new Date("2026-11-10T12:00:00Z");
 
-function memoryRepository(parts: PartRef[], storeSlugs: string[]) {
+function memoryRepository(
+  parts: PartRef[],
+  storeSlugs: string[],
+  stored: StoredOffer[] = [],
+) {
   const written: AcceptedOffer[][] = [];
   const repository: OfferRepository = {
     listParts: async () => parts,
     listStoreSlugs: async () => storeSlugs,
+    listOffers: async () => stored,
     upsertOffers: async (offers) => {
       written.push([...offers]);
     },
@@ -99,6 +104,27 @@ describe("syncPrices", () => {
     });
     expect(report.written).toBe(0);
     expect(report.rejected.map((r) => r.reason)).toEqual(["invalid"]);
+    expect(written).toEqual([[]]);
+  });
+
+  it("keeps a stored reference price when the seed reports the same pair", async () => {
+    const stored: StoredOffer = {
+      partSlug: part.slug,
+      storeSlug: "kabum",
+      source: "manual",
+      seenAt: new Date("2026-11-05T12:00:00Z"),
+    };
+    const { repository, written } = memoryRepository(
+      [part],
+      ["kabum"],
+      [stored],
+    );
+    const report = await syncPrices({
+      providers: [provider("seed", async () => [kabumOffer])],
+      repository,
+      now,
+    });
+    expect(report.rejected.map((r) => r.reason)).toEqual(["outranked"]);
     expect(written).toEqual([[]]);
   });
 });
