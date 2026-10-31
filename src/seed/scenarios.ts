@@ -71,6 +71,17 @@ export const scenarios: DemoScenario[] = [
     expected: ["MEMORY_TYPE_MISMATCH"],
   },
   {
+    name: "ddr5-on-d4-board",
+    description:
+      "Memória DDR5 na versão D4 (DDR4) de uma placa B760 que também sai em DDR5.",
+    parts: {
+      ...am5,
+      cpu: "intel-core-i5-14400f",
+      motherboard: "asus-tuf-gaming-b760m-plus-wifi-d4",
+    },
+    expected: ["MEMORY_TYPE_MISMATCH"],
+  },
+  {
     name: "four-modules-on-itx",
     description: "Kit de 4 módulos numa placa Mini-ITX com 2 slots.",
     parts: {
