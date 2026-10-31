@@ -2,7 +2,7 @@
 // playwright.config.ts, the global setup and the specs.
 export const PORT = Number(process.env.E2E_PORT ?? 3100);
 
-/** Listing page size on the E2E server, so 6 seed CPUs span two pages. */
+/** Listing page size on the E2E server, so the 15 seed CPUs span three pages. */
 export const E2E_PAGE_SIZE = 5;
 
 /**

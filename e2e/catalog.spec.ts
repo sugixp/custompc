@@ -1,8 +1,11 @@
 import { expect, test, type Page } from "@playwright/test";
 import { E2E_PAGE_SIZE } from "./servers";
 
-// Runs against the seed catalog: 6 CPUs, one of them (Ryzen 5 5600X) on AM4.
-// The E2E server shows E2E_PAGE_SIZE (5) parts per page, so CPUs take two.
+// Runs against the seed catalog: 15 CPUs, one of them (Core Ultra 7 265K) on
+// LGA1851 and none from Intel on AM4. The E2E server shows E2E_PAGE_SIZE (5)
+// parts per page, so CPUs take three.
+const CPU_COUNT = 15;
+const CPU_PAGES = Math.ceil(CPU_COUNT / E2E_PAGE_SIZE);
 
 const resultCount = (page: Page) =>
   page.getByRole("heading", { level: 2, name: /^\d+ peças?$/ });
@@ -16,19 +19,19 @@ test.describe("category listing", () => {
       page.getByRole("heading", { level: 1, name: "Processadores" }),
     ).toBeVisible();
     const cards = page.getByRole("article");
-    await expect(resultCount(page)).toHaveText("6 peças");
+    await expect(resultCount(page)).toHaveText(`${CPU_COUNT} peças`);
 
-    await page.getByLabel("Soquete").selectOption("AM4");
+    await page.getByLabel("Soquete").selectOption("LGA1851");
     await page.getByRole("button", { name: "Aplicar" }).click();
 
-    await expect(page).toHaveURL(/[?&]soquete=AM4\b/);
+    await expect(page).toHaveURL(/[?&]soquete=LGA1851\b/);
     await expect(cards).toHaveCount(1);
-    await expect(cards.first()).toContainText("Ryzen 5 5600X");
+    await expect(cards.first()).toContainText("Core Ultra 7 265K");
     await expect(cards.first()).toContainText("A partir de");
 
     // Opening the same URL directly shows the same result.
     await page.goto(page.url());
-    await expect(page.getByLabel("Soquete")).toHaveValue("AM4");
+    await expect(page.getByLabel("Soquete")).toHaveValue("LGA1851");
     await expect(cards).toHaveCount(1);
   });
 
@@ -40,7 +43,7 @@ test.describe("category listing", () => {
     await page
       .getByRole("link", { name: "veja todas as processadores" })
       .click();
-    await expect(resultCount(page)).toHaveText("6 peças");
+    await expect(resultCount(page)).toHaveText(`${CPU_COUNT} peças`);
   });
 
   test("pages through the results and keeps the sort order", async ({
@@ -50,15 +53,14 @@ test.describe("category listing", () => {
     const cards = page.getByRole("article");
     const pager = page.getByRole("navigation", { name: "Paginação" });
     await expect(cards).toHaveCount(E2E_PAGE_SIZE);
-    await expect(pager).toContainText("Página 1 de 2");
+    await expect(pager).toContainText(`Página 1 de ${CPU_PAGES}`);
     await expect(pager.getByRole("link", { name: /Anterior/ })).toHaveCount(0);
     const firstPage = await cards.allTextContents();
 
     await pager.getByRole("link", { name: /Próxima/ }).click();
     await expect(page).toHaveURL(/\?ordem=nome&pagina=2$/);
-    await expect(pager).toContainText("Página 2 de 2");
-    await expect(cards).toHaveCount(6 - E2E_PAGE_SIZE);
-    await expect(pager.getByRole("link", { name: /Próxima/ })).toHaveCount(0);
+    await expect(pager).toContainText(`Página 2 de ${CPU_PAGES}`);
+    await expect(cards).toHaveCount(E2E_PAGE_SIZE);
     expect(firstPage).not.toContain(await cards.first().textContent());
 
     await pager.getByRole("link", { name: /Anterior/ }).click();
@@ -72,9 +74,9 @@ test.describe("category listing", () => {
   }) => {
     const pager = page.getByRole("navigation", { name: "Paginação" });
     for (const [pagina, shown] of [
-      ["99", "Página 2 de 2"],
-      ["0", "Página 1 de 2"],
-      ["abc", "Página 1 de 2"],
+      ["99", `Página ${CPU_PAGES} de ${CPU_PAGES}`],
+      ["0", `Página 1 de ${CPU_PAGES}`],
+      ["abc", `Página 1 de ${CPU_PAGES}`],
     ] as const) {
       await page.goto(`/pecas/processadores?pagina=${pagina}`);
       await expect(pager).toContainText(shown);
@@ -92,7 +94,7 @@ test.describe("category listing", () => {
 
 test.describe("part page", () => {
   test("shows specs, sources and store offers", async ({ page }) => {
-    await page.goto("/pecas/processadores?ordem=nome");
+    await page.goto("/pecas/processadores?soquete=AM5&ordem=nome");
     await page.getByRole("link", { name: "Ryzen 5 7600", exact: true }).click();
 
     await expect(page).toHaveURL(/\/pecas\/processadores\/amd-ryzen-5-7600$/);

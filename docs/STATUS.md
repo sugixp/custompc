@@ -115,7 +115,7 @@ favorites move to Phase 3.
   which no other spec prices. The error page is tested on a second
   `next start` of the same build with an unreachable `DATABASE_URL`.
 - **Page size from `CATALOG_PAGE_SIZE`** (default 12, read at request
-  time). The E2E server uses 5, so the 6 seed CPUs span two pages without
+  time). The E2E server uses 5, so the 15 seed CPUs span three pages without
   inventing parts.
 - **Picker focus:** it opens on the search box, and after the first pick
   of a single-part slot focus goes to that slot's "Trocar" (the opener is
