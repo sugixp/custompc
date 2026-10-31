@@ -23,6 +23,7 @@
     "db:reset": "prisma migrate reset --force && prisma db seed",
     "db:studio": "prisma studio",
     "prices:sync": "tsx scripts/sync-prices.ts",
+    "prices:import": "tsx scripts/import-prices.ts",
     "test:e2e": "playwright test",
     "screenshots": "tsx scripts/screenshots.ts",
     "demo:media": "tsx scripts/demo-media.ts"

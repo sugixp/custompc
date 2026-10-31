@@ -78,7 +78,9 @@ flowchart LR
   das ofertas. Não importa Next.js, React nem Prisma; o ESLint garante.
 - **Preços** (`src/pricing`): o `prices:sync` carrega os provedores
   listados em `PRICE_PROVIDERS`, valida cada oferta com Zod e grava em lote.
-  As páginas só leem do banco.
+  As páginas só leem do banco. Preços de referência conferidos à mão entram
+  por `prices:import` de uma planilha CSV (exemplo fictício em
+  `data/prices.example.csv`) e sempre vencem os preços ilustrativos do seed.
 - **Specs num JSON validado por Zod** em vez de uma tabela por categoria; as
   linhas são validadas na leitura, então dados ruins falham alto.
 - **Renderização:** tudo que lê o banco, a URL ou o relógio vem em streaming
@@ -141,22 +143,23 @@ de desenvolvimento não é tocado.
 
 ## Scripts
 
-| Comando               | O que faz                                             |
-| --------------------- | ----------------------------------------------------- |
-| `npm run dev`         | Servidor de desenvolvimento                           |
-| `npm run lint`        | ESLint                                                |
-| `npm run typecheck`   | Checagem de tipos do TypeScript                       |
-| `npm test`            | Testes unitários (Vitest)                             |
-| `npm run test:e2e`    | Testes E2E e de acessibilidade (Playwright + axe)     |
-| `npm run screenshots` | Gera os screenshots em `docs/screenshots`             |
-| `npm run demo:media`  | Grava o GIF e o vídeo do montador (precisa do ffmpeg) |
-| `npm run format`      | Formata o código com Prettier                         |
-| `npm run db:up`       | Sobe o Postgres (Docker)                              |
-| `npm run db:deploy`   | Aplica as migrations                                  |
-| `npm run db:migrate`  | Cria uma migration (desenvolvimento)                  |
-| `npm run db:seed`     | Carrega os dados de exemplo                           |
-| `npm run db:reset`    | Recria o banco e roda o seed                          |
-| `npm run prices:sync` | Atualiza as ofertas a partir dos provedores de preço  |
+| Comando                                | O que faz                                             |
+| -------------------------------------- | ----------------------------------------------------- |
+| `npm run dev`                          | Servidor de desenvolvimento                           |
+| `npm run lint`                         | ESLint                                                |
+| `npm run typecheck`                    | Checagem de tipos do TypeScript                       |
+| `npm test`                             | Testes unitários (Vitest)                             |
+| `npm run test:e2e`                     | Testes E2E e de acessibilidade (Playwright + axe)     |
+| `npm run screenshots`                  | Gera os screenshots em `docs/screenshots`             |
+| `npm run demo:media`                   | Grava o GIF e o vídeo do montador (precisa do ffmpeg) |
+| `npm run format`                       | Formata o código com Prettier                         |
+| `npm run db:up`                        | Sobe o Postgres (Docker)                              |
+| `npm run db:deploy`                    | Aplica as migrations                                  |
+| `npm run db:migrate`                   | Cria uma migration (desenvolvimento)                  |
+| `npm run db:seed`                      | Carrega os dados de exemplo                           |
+| `npm run db:reset`                     | Recria o banco e roda o seed                          |
+| `npm run prices:sync`                  | Atualiza as ofertas a partir dos provedores de preço  |
+| `npm run prices:import -- arquivo.csv` | Importa preços de referência conferidos à mão         |
 
 ## Status e roadmap
 
@@ -261,6 +264,9 @@ npm run dev                # http://localhost:3000
 Docker's Postgres listens on host port **5432**; if it is taken, set
 `POSTGRES_PORT` in `.env` (e.g. `5433`) and use the same port in
 `DATABASE_URL`. Seed prices are **illustrative**; part specs are real.
+Reference prices checked by hand come from a CSV spreadsheet through
+`npm run prices:import -- file.csv` (fictitious example in
+`data/prices.example.csv`) and always outrank the illustrative ones.
 
 ### Testing
 

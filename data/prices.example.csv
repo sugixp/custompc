@@ -1,0 +1,5 @@
+part_slug;store_slug;price_brl;url;checked_on;in_stock
+amd-ryzen-5-7600;kabum;1.111,11;https://www.kabum.com.br/produto/000000/exemplo-ficticio;2026-10-31;sim
+amd-ryzen-5-7600;terabyte;1.122,22;https://www.terabyteshop.com.br/produto/00000/exemplo-ficticio;31/10/2026;
+kingston-nv3-1tb;kabum;333,33;https://www.kabum.com.br/produto/000001/exemplo-ficticio;31/10/2026;não
+kingston-nv3-1tb;terabyte;;;;
